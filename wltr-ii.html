@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calibration Analytics Web Application - Scrum Backlog</title>
+  <style>
+    :root{
+      --bg:#f4f6f9;
+      --card:#ffffff;
+      --text:#243447;
+      --muted:#5f6c7b;
+      --line:#d9e2ec;
+      --primary:#1c3d5a;
+      --primary2:#2a5d84;
+      --accent:#4caf50;
+      --soft:#f8fafc;
+      --code:#eef3f8;
+      --warn:#fff4d6;
+      --shadow:0 2px 8px rgba(0,0,0,0.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      line-height:1.6;
+    }
+    .container{
+      max-width:1280px;
+      margin:32px auto 60px;
+      padding:0 20px;
+    }
+    h1{
+      color:var(--primary);
+      border-bottom:3px solid var(--primary);
+      padding-bottom:12px;
+      margin:0 0 14px;
+      font-size:32px;
+    }
+    h2{
+      color:var(--primary2);
+      margin:0 0 10px;
+      font-size:20px;
+    }
+    .intro{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:10px;
+      box-shadow:var(--shadow);
+      padding:20px;
+      margin-bottom:24px;
+    }
+    .intro p{margin:0 0 12px}
+    .intro ul{margin:0 0 0 20px}
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:14px;
+      margin-top:16px;
+    }
+    .summary-box{
+      background:var(--soft);
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:12px 14px;
+    }
+    .summary-box b{color:var(--primary)}
+    details.epic{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:10px;
+      box-shadow:var(--shadow);
+      margin:18px 0;
+      overflow:hidden;
+    }
+    details.epic summary{
+      cursor:pointer;
+      list-style:none;
+      background:var(--primary2);
+      color:#fff;
+      padding:16px 18px;
+      font-size:21px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    details.epic summary::-webkit-details-marker{display:none}
+    details.epic summary::after{
+      content:"+";
+      font-size:28px;
+      font-weight:400;
+      line-height:1;
+      flex:0 0 auto;
+    }
+    details.epic[open] summary::after{content:"−"}
+    .epic-left{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .epic-title{font-weight:700}
+    .epic-content{
+      padding:20px;
+      background:#fff;
+    }
+    .epic-desc{
+      background:var(--soft);
+      border-left:5px solid var(--primary2);
+      padding:12px 14px;
+      margin:0 0 18px;
+      color:var(--muted);
+    }
+    .story{
+      background:#fff;
+      border:1px solid var(--line);
+      border-left:6px solid var(--primary2);
+      border-radius:8px;
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin:16px 0;
+    }
+    .story-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:8px;
+      flex-wrap:wrap;
+    }
+    .story-id{
+      font-weight:700;
+      color:var(--primary);
+      font-size:18px;
+    }
+    .story-text{
+      margin-bottom:12px;
+    }
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:10px 0 14px;
+    }
+    .chip{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef4fa;
+      color:var(--primary);
+      font-size:12px;
+      border:1px solid #d6e2ee;
+    }
+    .section{
+      margin-top:12px;
+    }
+    .section-title{
+      font-weight:700;
+      color:var(--primary2);
+      margin-bottom:6px;
+    }
+    .acceptance{
+      background:var(--soft);
+      border-left:4px solid var(--accent);
+      padding:12px 14px;
+      border-radius:4px;
+      margin-top:10px;
+    }
+    .acceptance ul,
+    .section ul{
+      margin:8px 0 0 20px;
+    }
+    pre{
+      background:var(--code);
+      border:1px solid var(--line);
+      padding:12px;
+      overflow:auto;
+      border-radius:6px;
+      margin:10px 0 0;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    code{
+      background:var(--code);
+      padding:2px 5px;
+      border-radius:4px;
+      border:1px solid #dde7f0;
+    }
+    .footer-note{
+      margin-top:24px;
+      padding:14px 16px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--muted);
+      box-shadow:var(--shadow);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calibration Analytics Web Application - Scrum Backlog</h1>
+
+    <div class="intro">
+      <p>
+        This file consolidates the full Scrum backlog for building a .NET web application that replaces the Excel-based
+        calibration analytics workbook and adds QuickBooks integration. It covers the entire scope from project setup through
+        deployment, including ingestion, parsing, mapping, normalization, manual regression, statistics, ICV verification,
+        reporting, QA approval, testing, and accounting sync.
+      </p>
+      <p>The backlog reproduces behavior currently spread across these workbook areas:</p>
+      <ul>
+        <li><b>Cal Data</b> – raw calibration run ingestion and parsing</li>
+        <li><b>ICV Data</b> – verification run ingestion and validation</li>
+        <li><b>Ref Table</b> – method configuration, thresholds, regression options, and level mappings</li>
+        <li><b>Report Writer</b> – lookup-style derivations, internal standard summaries, normalization support</li>
+        <li><b>DVD</b> – manual regression engine, weighting, point inclusion and exclusion, predicted values, residuals, RSE, r/r²</li>
+        <li><b>Summary Report</b> – final acceptance rules, pass/fail status, and reporting layer</li>
+        <li><b>QuickBooks</b> – customer sync, invoice-ready payloads, invoice creation, and status sync</li>
+      </ul>
+
+      <div class="summary-grid">
+        <div class="summary-box"><b>Total Epics:</b> 17</div>
+        <div class="summary-box"><b>Total Stories:</b> 49</div>
+      </div>
+    </div>
+
+    <details class="epic" open>
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 1 – Project Foundation and Architecture</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Establish the application structure, environments, configuration, error handling, and logging required to support an auditable analytics platform.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 1.1 – Create the solution structure</div>
+          </div>
+          <div class="story-text">
+            As a developer, I want a structured .NET solution with separated layers so that the application is maintainable,
+            testable, and scalable as the calibration workflow grows.
+          </div>
+          <div class="meta">
+            <span class="chip">Backend</span><span class="chip">Architecture</span><span class="chip">Setup</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create projects: <code>Api</code>, <code>WebUI</code>, <code>Domain</code>, <code>Application</code>, <code>Infrastructure</code>, <code>Tests.Unit</code>, and <code>Tests.Integration</code>.</li>
+              <li>Enforce dependency boundaries so Domain does not depend on Infrastructure or WebUI.</li>
+              <li>Use ASP.NET Core for the API and a .NET-compatible web front end.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The solution builds successfully using <code>dotnet build</code>.</li>
+              <li>The API starts locally without runtime errors.</li>
+              <li>The API exposes a <code>/health</code> endpoint returning HTTP 200.</li>
+              <li>The WebUI starts and loads a home page successfully.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 1.2 – Configure environment settings and secrets</div>
+          </div>
+          <div class="story-text">
+            As a developer, I want environment-specific configuration and secure secret management so that the application can run safely across development, test, and production.
+          </div>
+          <div class="meta">
+            <span class="chip">Config</span><span class="chip">Security</span><span class="chip">Setup</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create <code>appsettings.Development.json</code>, <code>appsettings.Staging.json</code>, and <code>appsettings.Production.json</code>.</li>
+              <li>Use user-secrets locally and environment variables for deployed environments.</li>
+              <li>Validate required configuration at startup, including database connection string, JWT settings, and feature flags.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Required settings are validated at startup.</li>
+              <li>If a required setting is missing, the application fails fast with a clear startup error message.</li>
+              <li>No secrets are stored in source control.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 1.3 – Add global error handling and structured logging</div>
+          </div>
+          <div class="story-text">
+            As a support engineer, I want consistent error responses and structured logs so that failures can be diagnosed quickly and safely in production.
+          </div>
+          <div class="meta">
+            <span class="chip">Observability</span><span class="chip">API</span><span class="chip">Supportability</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Add middleware for correlation IDs.</li>
+              <li>Return RFC7807 <code>ProblemDetails</code> responses for unhandled exceptions.</li>
+              <li>Log request path, user identity, and trace id for all errors.</li>
+            </ul>
+            <pre>{
+  "type": "https://httpstatuses.com/500",
+  "title": "Unexpected error",
+  "status": 500,
+  "traceId": "00-abc..."
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Unhandled API exceptions return <code>application/problem+json</code>.</li>
+              <li>Error logs include correlation or trace ID.</li>
+              <li>Error responses do not expose stack traces in production mode.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 2 – Database, EF Core, and Core Data Model</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Build the persistent data model that represents runs, analytes, configurations, regression outputs, approval records, and audit history.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 2.1 – Create the database context and migrations</div>
+          </div>
+          <div class="story-text">
+            As a developer, I want Entity Framework Core configured with migrations so that the application database schema can be created and evolved in a controlled way.
+          </div>
+          <div class="meta">
+            <span class="chip">Database</span><span class="chip">EF Core</span><span class="chip">Backend</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Use SQL Server as the primary database.</li>
+              <li>Create the application <code>DbContext</code> inside Infrastructure.</li>
+              <li>Add migration support and a DB health endpoint.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li><code>dotnet ef migrations add InitialCreate</code> succeeds.</li>
+              <li><code>dotnet ef database update</code> creates the schema successfully.</li>
+              <li>The API <code>/health/db</code> endpoint returns HTTP 200 when the database is reachable.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 2.2 – Add common audit, soft delete, and concurrency fields</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want entity changes to be traceable and protected from accidental overwrite so that result integrity is maintained.
+          </div>
+          <div class="meta">
+            <span class="chip">Audit</span><span class="chip">Database</span><span class="chip">Concurrency</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Add <code>CreatedAt</code>, <code>CreatedBy</code>, <code>UpdatedAt</code>, <code>UpdatedBy</code>, <code>IsDeleted</code>, and <code>RowVersion</code> to base entities.</li>
+              <li>Use EF global filters to exclude soft-deleted data from normal queries.</li>
+              <li>Use <code>RowVersion</code> for optimistic concurrency control.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Soft-deleted records are hidden from normal API responses.</li>
+              <li>Create and update operations populate audit fields automatically.</li>
+              <li>Concurrent updates to the same record return HTTP 409 Conflict.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 2.3 – Model the calibration domain entities</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the system to store runs, measurements, calibration groups, and regression outputs so that every calculation is reproducible and reportable.
+          </div>
+          <div class="meta">
+            <span class="chip">Domain</span><span class="chip">Database</span><span class="chip">Core Model</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create entities for Instrument, Analyte, AnalyteAlias, InternalStandard, MethodConfig, CalibrationLevel, CalibrationRun, CalibrationMeasurement, CalibrationGroup, CalibrationCurve, CalibrationPoint, ApprovalRecord, and AuditLog.</li>
+              <li>Support CAL and ICV run types.</li>
+              <li>Store raw text hash, configuration snapshot reference, and calculation version.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>All entities are represented as database tables with foreign keys.</li>
+              <li>CalibrationRun supports one-to-many measurements.</li>
+              <li>CalibrationGroup supports multiple CAL runs and optional ICV run.</li>
+              <li>CalibrationCurve stores slope, intercept, weighting mode, regression type, RSE, and R².</li>
+              <li>CalibrationPoint stores observed values, predicted values, residuals, %diff, inclusion flag, and exclusion reason.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 3 – Authentication, Authorization, and Roles</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Control access to uploading runs, approving reports, and editing method configuration by role.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 3.1 – Configure ASP.NET Core Identity</div>
+          </div>
+          <div class="story-text">
+            As an administrator, I want user accounts and roles managed centrally so that only authorized personnel can access sensitive calibration functions.
+          </div>
+          <div class="meta">
+            <span class="chip">Identity</span><span class="chip">Security</span><span class="chip">Backend</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Use ASP.NET Core Identity with SQL-backed stores.</li>
+              <li>Create roles: Admin, Analyst, QA, Viewer.</li>
+              <li>Enable password policy and account lockout rules.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Users can be created and stored in the Identity tables.</li>
+              <li>Roles Admin, Analyst, QA, and Viewer exist after seed.</li>
+              <li>Weak passwords are rejected by the API.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 3.2 – Issue JWT tokens for authenticated users</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want to log in and receive an authentication token so that I can access protected calibration workflows.
+          </div>
+          <div class="meta">
+            <span class="chip">JWT</span><span class="chip">API</span><span class="chip">Security</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create <code>POST /api/auth/login</code>.</li>
+              <li>Return JWT containing user id and role claims.</li>
+            </ul>
+            <pre>POST /api/auth/login
+{
+  "email": "qa@lab.com",
+  "password": "P@ssw0rd!"
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Valid credentials return HTTP 200 and a JWT token.</li>
+              <li>Invalid credentials return HTTP 401.</li>
+              <li>Protected endpoints reject missing or expired tokens.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 3.3 – Enforce role-based access policies</div>
+          </div>
+          <div class="story-text">
+            As a QA manager, I want permissions enforced by role so that only authorized users can upload runs, approve results, or edit method settings.
+          </div>
+          <div class="meta">
+            <span class="chip">Authorization</span><span class="chip">Security</span><span class="chip">Policy</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create policies such as <code>CanUploadRuns</code>, <code>CanApproveCalibration</code>, and <code>CanEditMethodConfig</code>.</li>
+              <li>Apply policies to relevant API routes.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Analyst can upload and process runs but cannot approve reports.</li>
+              <li>QA can approve reports but cannot edit system-level configuration unless also Admin.</li>
+              <li>Viewer cannot upload, edit, compute, or approve.</li>
+              <li>Unauthorized requests return HTTP 401 or 403 as appropriate.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 4 – Method Configuration and Ref Table Replacement</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Replace the workbook Ref Table with versioned application configuration that defines thresholds, regression modes, labels, and level mappings.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 4.1 – Store versioned method configuration</div>
+          </div>
+          <div class="story-text">
+            As an administrator, I want method configuration to be versioned so that historical calculations remain traceable to the exact rules used at the time of computation.
+          </div>
+          <div class="meta">
+            <span class="chip">Config</span><span class="chip">Versioning</span><span class="chip">Ref Table</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Store regression type, weighting mode, force-zero setting, thresholds, label mode, min points, and max missed points.</li>
+              <li>Persist configuration snapshots used during each compute run.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>New configuration changes create a new version.</li>
+              <li>Existing calibration groups retain the configuration version they were computed with.</li>
+              <li>The report output includes the configuration version identifier.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 4.2 – Manage calibration levels and true concentrations</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want calibration levels such as Cal_1ppb and Cal_10ppb mapped to true concentrations so that regression inputs can be generated correctly.
+          </div>
+          <div class="meta">
+            <span class="chip">Calibration Levels</span><span class="chip">Ref Table</span><span class="chip">Admin</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create CRUD support for CalibrationLevel.</li>
+              <li>Map each level name to a true concentration value.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Levels can be created, edited, and listed through API or admin UI.</li>
+              <li>Deletion is prevented if a level is referenced by an existing run or group.</li>
+              <li>Calibration group validation fails if any included CAL run has no mapped true concentration.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 4.3 – Manage acceptance thresholds and output labels</div>
+          </div>
+          <div class="story-text">
+            As a QA manager, I want configurable thresholds and label options so that the application can match the approved analytical method and workbook behavior.
+          </div>
+          <div class="meta">
+            <span class="chip">Thresholds</span><span class="chip">QA Rules</span><span class="chip">Ref Table</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Configure min r or r², max RSE, %diff low/high bounds, max missed points, min points required, and ICV limits.</li>
+              <li>Allow a label mode that displays either r or r² on reports.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Thresholds can be retrieved and updated through secured admin endpoints.</li>
+              <li>Invalid configurations, such as low bound greater than high bound, are rejected.</li>
+              <li>Reports reflect the configured metric label mode.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 5 – Raw Instrument Data Ingestion (Cal Data and ICV Data)</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Accept raw instrument text from calibration runs and ICV runs, preserve the source, and parse it into structured measurements.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 5.1 – Upload or paste raw instrument text for a run</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want to upload or paste raw instrument output so that calibration and verification runs can be processed without manually copying values into spreadsheets.
+          </div>
+          <div class="meta">
+            <span class="chip">Upload</span><span class="chip">Cal Data</span><span class="chip">ICV Data</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create <code>POST /api/runs</code>.</li>
+              <li>Accept payload fields for run type, instrument, level, run date, and raw text.</li>
+              <li>Store raw text and SHA-256 hash.</li>
+            </ul>
+            <pre>POST /api/runs
+{
+  "runType": "CAL",
+  "level": "Cal_10ppb",
+  "instrumentId": "MS4",
+  "runDate": "2026-03-05T10:42:00Z",
+  "rawText": "Data Path : ...\nCompound Results...\n"
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The endpoint accepts both CAL and ICV runs.</li>
+              <li>Each created run stores the raw text and generated text hash.</li>
+              <li>The API returns the created run identifier.</li>
+              <li>Only authorized roles can upload runs.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 5.2 – Parse run metadata from raw text</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want run metadata parsed automatically so that the report contains complete instrument and processing context.
+          </div>
+          <div class="meta">
+            <span class="chip">Parser</span><span class="chip">Metadata</span><span class="chip">Cal Data</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Parse fields such as Data Path, Data File, Acq On, Operator, Method, and Sample when present.</li>
+              <li>Handle missing metadata without crashing.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Recognized metadata fields are stored on the run record.</li>
+              <li>Missing metadata produces warnings rather than fatal parser failure.</li>
+              <li>Parsed metadata appears in run detail and report views.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 5.3 – Parse compound result rows from raw text</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want compound rows parsed into structured measurements so that the system can compute calibration results directly from the raw report.
+          </div>
+          <div class="meta">
+            <span class="chip">Parser</span><span class="chip">Measurements</span><span class="chip">Cal Data</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Parse fixed-width or delimited rows into compound name, retention time, quant ion, response, and calculated concentration when provided.</li>
+              <li>Store row-level parser warnings for malformed numeric values.</li>
+            </ul>
+            <pre>{
+  "compoundName": "Benzene",
+  "rt": 3.15,
+  "quantIon": 78,
+  "response": 17890,
+  "calculatedConc": 10.05
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Valid compound rows are stored as CalibrationMeasurement records.</li>
+              <li>Malformed rows are captured with validation messages referencing the source row.</li>
+              <li>The parser supports at least 200 compound rows in a single run.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 5.4 – Parse internal standard information from the run</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want internal standard responses identified from the raw report so that response ratios can be calculated consistently.
+          </div>
+          <div class="meta">
+            <span class="chip">Internal Standard</span><span class="chip">Parser</span><span class="chip">Report Writer</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Detect internal standard rows and capture response values.</li>
+              <li>Support multiple internal standards where a method requires them.</li>
+              <li>Map each analyte to the appropriate internal standard if multiple IS values exist.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Internal standard responses are stored with the run or measurement records.</li>
+              <li>If no required internal standard is found, the run is marked invalid for computation.</li>
+              <li>Internal standard data is visible in the run detail output.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 6 – Mapping, Validation, and Normalization</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Replace workbook lookup logic with deterministic analyte mapping, validation rules, ratio calculations, and internal standard summaries.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 6.1 – Maintain analyte aliases for raw compound names</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want raw compound names matched to canonical analytes so that calculations are performed consistently across runs and historical data.
+          </div>
+          <div class="meta">
+            <span class="chip">Mapping</span><span class="chip">Aliases</span><span class="chip">Report Writer</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create an analyte master list and alias table.</li>
+              <li>Use exact match first, alias match second, and unresolved status otherwise.</li>
+              <li>Provide UI or API support to add new aliases.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Exact or alias matches auto-link a measurement to a canonical analyte.</li>
+              <li>Unmatched compounds are flagged for review.</li>
+              <li>New aliases immediately apply to reprocessing of affected runs.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 6.2 – Resolve unmatched analytes through a mapping workflow</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want to review and resolve unmatched compound names so that no valid measurement is blocked by naming inconsistencies in the raw report.
+          </div>
+          <div class="meta">
+            <span class="chip">UI</span><span class="chip">Mapping</span><span class="chip">Workflow</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Provide a screen or endpoint showing unresolved compound names with suggested matches.</li>
+              <li>Allow the user to select a canonical analyte and optionally save as alias.</li>
+              <li>Trigger reprocessing after resolution.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Unmatched analytes can be resolved without reuploading the run.</li>
+              <li>Saved aliases are used automatically in future runs.</li>
+              <li>The audit log records who created or changed the mapping.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 6.3 – Validate parsed measurements before computation</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want parsed data validated before regression so that only complete and meaningful measurements are used in the final calibration result.
+          </div>
+          <div class="meta">
+            <span class="chip">Validation</span><span class="chip">Rules</span><span class="chip">Processing</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Validate missing internal standard, non-positive response, missing analyte mapping, and malformed concentration or ratio inputs.</li>
+              <li>Classify run status as Valid, ValidWithWarnings, or Invalid.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Validation results are returned in a structured format.</li>
+              <li>Invalid runs are blocked from regression computation.</li>
+              <li>Warnings remain visible to the user for valid-but-imperfect runs.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 6.4 – Compute response ratios for analyte measurements</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want response ratios calculated automatically so that instrument response is normalized against the internal standard before regression is performed.
+          </div>
+          <div class="meta">
+            <span class="chip">Normalization</span><span class="chip">Math</span><span class="chip">Report Writer</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Use <code>ratio = analyteResponse / internalStandardResponse</code>.</li>
+              <li>Store ratio with the measurement record.</li>
+            </ul>
+            <pre>if (internalStandardResponse &lt;= 0)
+  throw ValidationException("Internal standard response must be greater than zero");
+
+ratio = analyteResponse / internalStandardResponse;</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Ratios are computed for all valid measurements with an internal standard.</li>
+              <li>Division by zero or negative IS response returns a validation error.</li>
+              <li>Ratios are persisted and visible in debug or report views.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 6.5 – Produce internal standard summaries</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want internal standard response summaries available so that I can review whether the internal standard behaved consistently across runs.
+          </div>
+          <div class="meta">
+            <span class="chip">Internal Standard</span><span class="chip">Summary</span><span class="chip">Report Writer</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Compute min, max, mean, and count for IS responses per run or calibration group.</li>
+              <li>Support threshold-based warning flags if configured.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Internal standard summary values are shown on run or report screens.</li>
+              <li>If thresholds exist, out-of-range IS behavior is flagged visibly.</li>
+              <li>Summary values are exportable.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 7 – Calibration Grouping and Run Assembly</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Replace the workbook’s side-by-side calibration blocks with explicit grouping of individual CAL runs and optional ICV runs.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 7.1 – Create a calibration group from multiple runs</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want multiple CAL runs grouped into a single calibration group so that one calibration curve can be computed across all required concentration levels.
+          </div>
+          <div class="meta">
+            <span class="chip">Grouping</span><span class="chip">Cal Data</span><span class="chip">Workflow</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create <code>POST /api/calibration-groups</code>.</li>
+              <li>Associate multiple CAL run IDs and one optional ICV run ID.</li>
+              <li>Prevent duplicate use of the same level in one group unless a special override policy exists.</li>
+            </ul>
+            <pre>POST /api/calibration-groups
+{
+  "instrumentId": "MS4",
+  "calRunIds": ["cal1", "cal5", "cal10", "cal20"],
+  "icvRunId": "icv10"
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>A calibration group can contain multiple CAL runs.</li>
+              <li>Each included CAL run is tied to a level with a mapped concentration.</li>
+              <li>Duplicate levels are rejected with a clear validation message.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 7.2 – Validate group readiness before regression</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the system to validate whether a calibration group is ready for computation so that incomplete or invalid groupings do not produce misleading results.
+          </div>
+          <div class="meta">
+            <span class="chip">Validation</span><span class="chip">Grouping</span><span class="chip">Pre-Compute</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Check min required number of levels, valid mappings, present IS values, and valid ratio data.</li>
+              <li>Return blocking issues and warnings separately.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Groups missing required levels are marked not ready.</li>
+              <li>Groups with unmapped analytes or invalid runs are marked not ready.</li>
+              <li>The validation response lists all blocking issues explicitly.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 8 – Weighted Regression Preparation</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Compute and persist the weights and input structures required for manual regression in the same spirit as the DVD worksheet.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 8.1 – Apply configurable weighting schemes to calibration points</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the system to apply configurable weighting schemes to calibration points so that the regression model reflects the approved analytical chemistry methodology and improves fit behavior at relevant concentration ranges.
+          </div>
+          <div class="meta">
+            <span class="chip">Weighting</span><span class="chip">Regression</span><span class="chip">DVD</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Support weighting modes: NONE, 1/x, and 1/x².</li>
+              <li>Apply weights only to included points.</li>
+              <li>Persist the computed weight per calibration point.</li>
+            </ul>
+            <pre>NONE   → w = 1
+1/x    → w = 1 / x
+1/x²   → w = 1 / (x * x)</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Weights are computed for every included calibration point.</li>
+              <li>Weights are stored with each point record.</li>
+              <li>If weighting mode is 1/x or 1/x² and any included point has X less than or equal to 0, the system returns a validation error.</li>
+              <li>Excluded points do not contribute weights to the regression calculation.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 9 – Manual Regression Engine (DVD Sheet Replacement)</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Rebuild the workbook’s DVD logic using explicit formulas, input tables, inclusion rules, and derived statistics rather than hidden spreadsheet behavior.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 9.1 – Build the regression input table for each analyte</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want regression input tables built per analyte so that I can trace which calibration points and concentrations were used to compute each curve.
+          </div>
+          <div class="meta">
+            <span class="chip">Regression Input</span><span class="chip">DVD</span><span class="chip">Traceability</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>For each analyte in a group, assemble points where X = true concentration and Y = response ratio.</li>
+              <li>Sort points by concentration ascending.</li>
+              <li>Include initial inclusion state and any parser or validation flags.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each analyte has an input table containing X, Y, weight, inclusion flag, and source run id.</li>
+              <li>Missing ratio values are represented as excluded or NA-equivalent points.</li>
+              <li>Input tables are retrievable through a debug or report endpoint.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 9.2 – Exclude invalid or manually removed points from regression</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want invalid or manually excluded points removed from regression so that the model reflects only accepted calibration evidence.
+          </div>
+          <div class="meta">
+            <span class="chip">Point Exclusion</span><span class="chip">DVD</span><span class="chip">QA Rules</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Auto-exclude points with missing ratio, missing IS, or other invalid prerequisites.</li>
+              <li>Allow manual exclusion with a required reason.</li>
+              <li>Record exclusion reason and user where applicable.</li>
+            </ul>
+            <pre>Exclusion reason examples:
+MISSING_RATIO
+MISSING_IS
+INVALID_X
+MANUAL_EXCLUDE
+PCT_DIFF_OUT_OF_RANGE</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each excluded point has a non-empty exclusion reason.</li>
+              <li>Manually excluded points record the acting user and timestamp.</li>
+              <li>Only included points are used in subsequent regression formulas.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 9.3 – Compute manual weighted linear regression with intercept</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want calibration regression to be calculated manually using defined weighted least squares formulas so that the system reproduces the Excel workbook’s regression outputs.
+          </div>
+          <div class="meta">
+            <span class="chip">Manual Regression</span><span class="chip">Weighted Least Squares</span><span class="chip">DVD</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Do not use third-party regression libraries for this core algorithm.</li>
+              <li>Compute and persist the intermediate sums.</li>
+              <li>Handle denominator-zero conditions as validation failure.</li>
+            </ul>
+            <pre>S0  = Σ w
+Sx  = Σ w*x
+Sy  = Σ w*y
+Sxx = Σ w*x²
+Sxy = Σ w*x*y
+
+Den = (S0 * Sxx) - (Sx²)
+
+Slope (m) = ((S0 * Sxy) - (Sx * Sy)) / Den
+Intercept (b) = (Sy - (m * Sx)) / S0</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The system computes and stores S0, Sx, Sy, Sxx, Sxy, Den, slope, and intercept.</li>
+              <li>If Den equals 0, the computation fails with a clear validation error.</li>
+              <li>The regression result matches a known reference dataset within a documented numeric tolerance.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 9.4 – Compute manual weighted linear regression forced through zero</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the regression model to optionally be forced through zero so that the application can comply with methods that require zero intercept bias.
+          </div>
+          <div class="meta">
+            <span class="chip">Manual Regression</span><span class="chip">Forced Zero</span><span class="chip">DVD</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>When <code>ForceZeroIntercept=true</code>, set intercept to zero and compute slope using the forced-zero weighted formula.</li>
+            </ul>
+            <pre>Sxx0 = Σ (w * x²)
+Sxy0 = Σ (w * x * y)
+
+Slope (m) = Sxy0 / Sxx0
+Intercept (b) = 0</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The stored intercept value is always zero in forced-zero mode.</li>
+              <li>If Sxx0 equals 0, the computation fails with a clear validation error.</li>
+              <li>The regression output explicitly indicates forced-zero mode.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 9.5 – Support configurable quadratic regression mode</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the system to support quadratic regression when configured so that nonlinear calibration methods can be represented without leaving the application.
+          </div>
+          <div class="meta">
+            <span class="chip">Quadratic</span><span class="chip">Regression</span><span class="chip">Configurable</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Implement the configured quadratic mode only if required by the method.</li>
+              <li>Store coefficients a, b, c and identify the model type on the curve record.</li>
+              <li>Use the same point inclusion and weighting infrastructure.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>When regression type is quadratic, the curve record stores coefficients a, b, and c.</li>
+              <li>Predicted values use the quadratic equation consistently.</li>
+              <li>The report clearly identifies the model as quadratic.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 9.6 – Compute predicted values and residuals for each point</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want predicted values and residuals calculated for every included calibration point so that I can evaluate how well the model fits the observed data.
+          </div>
+          <div class="meta">
+            <span class="chip">Predicted Values</span><span class="chip">Residuals</span><span class="chip">DVD</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>For linear regression, use <code>ŷ = m*x + b</code> or <code>ŷ = m*x</code> in forced-zero mode.</li>
+              <li>For quadratic, use the configured quadratic equation.</li>
+              <li>Compute residual = observed - predicted.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each included point stores predicted value and residual.</li>
+              <li>Residuals are recalculated whenever the model is recomputed.</li>
+              <li>Residual values are available in the report drill-down and debug endpoints.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 9.7 – Expose regression debug output for analyte-level verification</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want a regression debug output for each analyte so that I can compare the application’s intermediate values to the workbook during migration validation.
+          </div>
+          <div class="meta">
+            <span class="chip">Debug</span><span class="chip">QA</span><span class="chip">Migration</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create a read-only endpoint returning included points, weights, predicted values, residuals, intermediate sums, and final statistics.</li>
+              <li>Restrict access to QA and Admin roles.</li>
+            </ul>
+            <pre>GET /api/calibration-groups/{groupId}/analytes/{analyteId}/regression-debug</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The debug endpoint returns all intermediate values used in the regression computation.</li>
+              <li>The output includes point-level and curve-level data.</li>
+              <li>Only QA and Admin roles can access the debug endpoint.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 10 – Statistical Metrics and Curve Quality</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Compute the statistical outputs required by the workbook and downstream acceptance rules, including SSE, RSE, and r or r².
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 10.1 – Compute SSE and RSE for each calibration curve</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the system to compute regression error metrics so that I can evaluate the precision and reliability of each calibration curve.
+          </div>
+          <div class="meta">
+            <span class="chip">Statistics</span><span class="chip">RSE</span><span class="chip">DVD</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Compute weighted SSE from residuals.</li>
+              <li>Compute RSE using degrees of freedom based on the number of model parameters.</li>
+            </ul>
+            <pre>SSE = Σ(w * (y - ŷ)²)
+
+RSE = sqrt( SSE / (n - p) )</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>SSE and RSE are stored on the curve result.</li>
+              <li>If the number of included points is less than or equal to the number of regression parameters, the system returns a validation error.</li>
+              <li>The values match known reference outputs within an agreed tolerance.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 10.2 – Compute coefficient of determination and optional correlation value</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the system to compute r², and optionally r, so that the report can present the configured measure of curve fit quality.
+          </div>
+          <div class="meta">
+            <span class="chip">Statistics</span><span class="chip">R²</span><span class="chip">Fit Quality</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Compute weighted mean of Y, then weighted total sum of squares.</li>
+              <li>Calculate <code>R² = 1 - SSE/SST</code>.</li>
+              <li>If configured label mode is r, derive and display r consistently.</li>
+            </ul>
+            <pre>ȳw = Σ(w*y) / Σ(w)
+SST = Σ(w * (y - ȳw)²)
+
+R² = 1 - (SSE / SST)</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The system stores R² for each curve.</li>
+              <li>If SST equals 0, the application handles the case deterministically and documents the result.</li>
+              <li>The report displays either r or r² based on configuration.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 11 – Calibration Acceptance Rules and Point-Level Evaluation</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Apply the workbook’s point-level and analyte-level acceptance logic, including %diff, Y/N flags, count rules, and failure reasons.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 11.1 – Compute point-level percent difference</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want percent difference calculated for each calibration point so that each point can be assessed against the method’s acceptance thresholds.
+          </div>
+          <div class="meta">
+            <span class="chip">%Diff</span><span class="chip">QA Rules</span><span class="chip">Summary Report</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Use the workbook’s defined formula to compare calculated and true values.</li>
+              <li>Store the point-level %diff for reporting and rule evaluation.</li>
+            </ul>
+            <pre>%Diff = (Calculated - True) / True * 100</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>%Diff is computed for every included point with a true concentration.</li>
+              <li>The value is stored with the point record.</li>
+              <li>Points without a true concentration are marked invalid for %diff evaluation.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 11.2 – Flag point acceptance as Y or N based on thresholds</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want each point flagged as accepted or rejected so that I can see which calibration points meet the configured method thresholds.
+          </div>
+          <div class="meta">
+            <span class="chip">Acceptance Flag</span><span class="chip">Summary Report</span><span class="chip">Rules</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Compare %diff to configured low and high limits.</li>
+              <li>Store pass flag as Y/N or equivalent boolean with report-friendly rendering.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>A point within configured limits is flagged accepted.</li>
+              <li>A point outside configured limits is flagged rejected.</li>
+              <li>The threshold bounds used are visible in the report or debug output.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 11.3 – Compute analyte-level CAL pass/fail with reasons</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want each analyte’s calibration status evaluated so that I know whether the calibration curve is acceptable for that analyte.
+          </div>
+          <div class="meta">
+            <span class="chip">CAL Status</span><span class="chip">Pass/Fail</span><span class="chip">Summary Report</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Evaluate min r or r², max RSE, max missed points, min points used, and any other configured criteria.</li>
+              <li>Store failure reasons explicitly.</li>
+            </ul>
+            <pre>{
+  "analyte": "Benzene",
+  "status": "FAIL",
+  "reasons": [
+    {"rule":"RSE_MAX","expected":"<=15%","actual":"18.2%"},
+    {"rule":"MAX_MISSED_POINTS","expected":"<=1","actual":"2"}
+  ]
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each analyte receives a final CAL status of PASS or FAIL.</li>
+              <li>FAIL results include one or more explicit reasons.</li>
+              <li>Status changes when relevant thresholds or included points change and the group is recomputed.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 11.4 – Support manual point exclusion with audit details</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want to manually exclude a calibration point with a reason so that I can reflect justified review decisions while preserving auditability.
+          </div>
+          <div class="meta">
+            <span class="chip">Manual Override</span><span class="chip">Audit</span><span class="chip">QA</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Provide an action to exclude or re-include a point.</li>
+              <li>Require a user-entered reason for exclusion.</li>
+              <li>Force recomputation after changes.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>A manual exclusion cannot be saved without a reason.</li>
+              <li>The exclusion is stored with user, timestamp, and reason.</li>
+              <li>The next computation reflects the changed inclusion state.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 12 – ICV Verification</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Validate the ICV run against the computed calibration curve and determine pass/fail at analyte and group levels.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 12.1 – Calculate ICV concentrations from the calibration curve</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want the ICV run evaluated against the calibration curve so that I can confirm the model accurately predicts known verification concentrations.
+          </div>
+          <div class="meta">
+            <span class="chip">ICV</span><span class="chip">Verification</span><span class="chip">Summary Report</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Use the ICV response ratio and invert the computed curve to obtain calculated concentration.</li>
+              <li>Support the applicable inversion logic for the configured model type.</li>
+            </ul>
+            <pre>For linear with intercept:
+Y = mX + b
+X = (Y - b) / m</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The system computes an ICV calculated concentration for each analyte with valid ICV input and available calibration curve.</li>
+              <li>If the curve cannot be inverted safely, the analyte is flagged with a clear verification error.</li>
+              <li>The calculated concentration is stored for reporting.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 12.2 – Evaluate ICV percent difference and pass/fail status</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want ICV %diff and pass/fail status computed so that I can verify whether the calibration curve produces acceptable results on a known standard.
+          </div>
+          <div class="meta">
+            <span class="chip">ICV</span><span class="chip">%Diff</span><span class="chip">Pass/Fail</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Compute ICV %diff using calculated and true ICV concentration.</li>
+              <li>Apply the configured ICV threshold to determine pass or fail.</li>
+              <li>Roll up analyte-level ICV results to a group-level ICV status.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each analyte present in the ICV run has an ICV status if a valid curve exists.</li>
+              <li>The report shows calculated concentration, true concentration, %diff, and pass/fail.</li>
+              <li>The group shows an overall ICV pass/fail rollup.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 13 – Reporting, Summary, and Exports</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Present the workbook-equivalent summary report, analyte details, and exportable outputs for QA review and audit storage.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 13.1 – Provide a report API that returns the full calibration summary</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want a single report payload containing all calibration results so that the UI can render the full summary consistently and completely.
+          </div>
+          <div class="meta">
+            <span class="chip">API</span><span class="chip">Summary Report</span><span class="chip">Reporting</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create <code>GET /api/calibration-groups/{id}/report</code>.</li>
+              <li>Include metadata, configuration version, analyte curve rows, point tables, ICV results, and overall status.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The report payload includes all data required to render the summary report without additional calculations in the browser.</li>
+              <li>Results are returned in deterministic order.</li>
+              <li>Payload includes group metadata, run identifiers, and approval status.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 13.2 – Render the summary report in the web application</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want to view a readable calibration summary report so that I can review analyte results, failures, and point-level details without opening Excel.
+          </div>
+          <div class="meta">
+            <span class="chip">Frontend</span><span class="chip">Summary Report</span><span class="chip">UI</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Display a header section with instrument, method, operator, run dates, and configuration version.</li>
+              <li>Display analyte-level rows with slope, intercept, r or r², RSE, point counts, and status.</li>
+              <li>Support drill-down to point-level details and exclusion reasons.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The report screen displays analyte-level metrics and pass/fail status.</li>
+              <li>Failure reasons and point details are accessible from the UI.</li>
+              <li>The UI values match the report API output exactly.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 13.3 – Export the report as PDF for audit use</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want to export the final report as PDF so that a stable, printable audit artifact can be stored and shared.
+          </div>
+          <div class="meta">
+            <span class="chip">Export</span><span class="chip">PDF</span><span class="chip">Audit</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Generate a PDF from stored report data rather than browser-only state.</li>
+              <li>Include metadata, analyte results, point summaries, ICV results, status, and approval details.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The PDF includes overall status, analyte table, configuration version, and approval information.</li>
+              <li>The PDF can be generated for any computed calibration group.</li>
+              <li>The PDF content matches the stored report values.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 13.4 – Export point-level and curve-level data as CSV</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want CSV exports of the processed data so that I can compare, archive, or analyze results outside the application when needed.
+          </div>
+          <div class="meta">
+            <span class="chip">Export</span><span class="chip">CSV</span><span class="chip">Data Extraction</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Export curve-level fields and point-level fields in a structured CSV format.</li>
+              <li>Include identifiers and version information for traceability.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>CSV export includes analyte, level, X, observed Y, predicted Y, residual, %diff, included flag, and curve identifiers.</li>
+              <li>The export includes configuration version and group id.</li>
+              <li>Only authorized users can export the data.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 14 – QA Approval, Audit Trail, and Locking</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Ensure final calibration groups can be approved, locked, and audited in a way that supports regulated review workflows.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 14.1 – Approve a calibration group and lock its results</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want to approve a calibration group so that its results become final and protected from accidental change.
+          </div>
+          <div class="meta">
+            <span class="chip">QA</span><span class="chip">Approval</span><span class="chip">Locking</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create <code>POST /api/calibration-groups/{id}/approve</code>.</li>
+              <li>Store reviewer identity, timestamp, and comment.</li>
+              <li>Prevent edits to approved group results.</li>
+            </ul>
+            <pre>POST /api/calibration-groups/123/approve
+{
+  "comment": "Reviewed against SOP and approved."
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Only QA role can approve a group.</li>
+              <li>Approval requires the group to have computed results.</li>
+              <li>After approval, the group becomes read-only.</li>
+              <li>Approval details appear on the report and exports.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 14.2 – Record an audit trail for important changes</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want key actions logged so that I can see who changed mappings, exclusions, configurations, and approvals during the lifecycle of a calibration result.
+          </div>
+          <div class="meta">
+            <span class="chip">Audit</span><span class="chip">Traceability</span><span class="chip">Compliance</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Audit changes to method configuration, analyte aliases, manual point exclusions, recomputes, and approvals.</li>
+              <li>Store old and new values where appropriate.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each audited event records user, timestamp, action type, and affected entity id.</li>
+              <li>Manual changes store both the previous and new state where meaningful.</li>
+              <li>Audit data is queryable for review.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 15 – Testing, Excel Parity, and Quality Assurance</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Prove that the web application reproduces workbook logic using automated tests, parity datasets, and security validation.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 15.1 – Create golden dataset tests for Excel parity</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want golden dataset tests comparing workbook and application outputs so that the migration can be validated with confidence.
+          </div>
+          <div class="meta">
+            <span class="chip">Testing</span><span class="chip">Parity</span><span class="chip">Migration</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create representative CAL and ICV input datasets from the workbook context.</li>
+              <li>Capture expected outputs for slope, intercept, RSE, r or r², %diff, inclusion state, and pass/fail.</li>
+              <li>Build automated tests that compare results with numeric tolerances.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Automated tests exist for at least one full calibration group and one ICV group.</li>
+              <li>Regression and final pass/fail outputs match the reference expectations within documented tolerance.</li>
+              <li>Test failures identify the mismatched field clearly.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 15.2 – Create parser robustness tests</div>
+          </div>
+          <div class="story-text">
+            As a developer, I want parser tests for varying raw report shapes so that text format differences do not silently break run ingestion.
+          </div>
+          <div class="meta">
+            <span class="chip">Testing</span><span class="chip">Parser</span><span class="chip">Robustness</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Test fixed-width rows, spacing differences, missing metadata, and malformed numeric values.</li>
+              <li>Verify warnings and blocking errors separately.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Parser tests cover both valid and invalid row scenarios.</li>
+              <li>Malformed data generates deterministic error or warning messages.</li>
+              <li>Valid data consistently produces the expected parsed measurements.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 15.3 – Create regression unit tests for all supported modes</div>
+          </div>
+          <div class="story-text">
+            As a developer, I want regression unit tests for weighted, unweighted, forced-zero, and quadratic modes so that the manual math engine remains correct as the application evolves.
+          </div>
+          <div class="meta">
+            <span class="chip">Testing</span><span class="chip">Regression</span><span class="chip">Math</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Test NONE, 1/x, and 1/x² weighting.</li>
+              <li>Test intercept and forced-zero modes.</li>
+              <li>Test degenerate denominator cases and too-few-points cases.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each supported regression mode has at least one unit test with known expected outputs.</li>
+              <li>Degenerate inputs return expected validation errors.</li>
+              <li>Point-level predicted values and residuals are validated for at least one dataset.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 15.4 – Create integration tests for end-to-end processing</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want end-to-end tests from upload through report generation so that the full calibration workflow is verified as one coherent system.
+          </div>
+          <div class="meta">
+            <span class="chip">Integration Tests</span><span class="chip">End-to-End</span><span class="chip">Workflow</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Cover: login → upload run → resolve mappings if needed → create group → compute → report → approve.</li>
+              <li>Run against a test database.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The integration suite covers the full happy path for CAL and ICV.</li>
+              <li>The suite verifies HTTP status codes, key outputs, and role behavior.</li>
+              <li>The suite can run in CI automatically.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 15.5 – Validate authorization behavior through tests</div>
+          </div>
+          <div class="story-text">
+            As a security reviewer, I want authorization tests for all sensitive endpoints so that only the correct roles can access high-risk actions.
+          </div>
+          <div class="meta">
+            <span class="chip">Security Tests</span><span class="chip">Authorization</span><span class="chip">API</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Test upload, config edits, approval, and export access by role.</li>
+              <li>Verify 401 vs 403 behavior.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Analyst, QA, Viewer, and Admin role behaviors are verified.</li>
+              <li>Unauthorized access attempts return correct status codes.</li>
+              <li>Tests fail if a restricted role gains access unexpectedly.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 16 – Deployment, CI/CD, and Operational Readiness</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Prepare the application for reliable local development, automated builds, and safe deployment into hosted environments.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 16.1 – Containerize the application stack for local development</div>
+          </div>
+          <div class="story-text">
+            As a developer, I want the API, web app, and database runnable via containers so that the team can stand up the environment consistently with minimal setup effort.
+          </div>
+          <div class="meta">
+            <span class="chip">Docker</span><span class="chip">Local Dev</span><span class="chip">DevOps</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create Dockerfiles for API and WebUI.</li>
+              <li>Create a Docker Compose file for API, WebUI, and SQL Server.</li>
+              <li>Add startup health checks.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li><code>docker compose up</code> starts the full stack successfully.</li>
+              <li>The API and WebUI containers become healthy.</li>
+              <li>The database is reachable by the API container.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 16.2 – Create a CI pipeline for build and test</div>
+          </div>
+          <div class="story-text">
+            As a development team, I want automated builds and test execution on every change so that defects are caught early and releases remain stable.
+          </div>
+          <div class="meta">
+            <span class="chip">CI</span><span class="chip">Build</span><span class="chip">Automation</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Run restore, build, unit tests, and integration tests on pull requests.</li>
+              <li>Publish build artifacts.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The CI pipeline blocks merge on build or test failure.</li>
+              <li>Artifacts are generated for successful builds.</li>
+              <li>Test reports are visible from the pipeline run.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 16.3 – Define a safe migration and deployment strategy</div>
+          </div>
+          <div class="story-text">
+            As an operations engineer, I want a controlled migration and deployment process so that database changes and application releases do not corrupt calibration data or interrupt QA workflows.
+          </div>
+          <div class="meta">
+            <span class="chip">Deployment</span><span class="chip">Migrations</span><span class="chip">Operations</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Define how EF migrations are applied in staging and production.</li>
+              <li>Document rollback and recovery steps.</li>
+              <li>Ensure configuration is environment-driven.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The deployment process documents how database migrations are applied.</li>
+              <li>A rollback or recovery procedure exists for failed deployments.</li>
+              <li>The application can start in staging with production-like configuration values.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="epic">
+      <summary>
+        <div class="epic-left">
+          <div class="epic-title">Epic 17 – QuickBooks Integration</div>
+        </div>
+      </summary>
+      <div class="epic-content">
+        <div class="epic-desc">
+          Integrate the application with QuickBooks so that calibration-related business records, customer context, billing artifacts, and approved report metadata can be synchronized where required by the product owner.
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.1 – Configure QuickBooks connection settings</div>
+          </div>
+          <div class="story-text">
+            As an administrator, I want QuickBooks integration settings managed securely so that the application can connect to the correct QuickBooks company without exposing secrets.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Security</span><span class="chip">Admin</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Store QuickBooks client id, client secret, redirect URI, environment mode, and company realm id securely.</li>
+              <li>Support sandbox and production environments.</li>
+              <li>Do not store secrets in source control.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>QuickBooks configuration values are stored outside source control.</li>
+              <li>The application supports separate sandbox and production configurations.</li>
+              <li>Missing or invalid QuickBooks settings produce a clear validation error in the admin UI or API.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.2 – Connect a QuickBooks company using OAuth</div>
+          </div>
+          <div class="story-text">
+            As an administrator, I want to authorize the application against QuickBooks so that approved application features can read from and write to the connected QuickBooks company.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">OAuth</span><span class="chip">Integration</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Implement OAuth authorization redirect and callback flow.</li>
+              <li>Store access token, refresh token, expiry, and realm id securely.</li>
+              <li>Refresh expired tokens automatically when possible.</li>
+            </ul>
+            <pre>GET /api/integrations/quickbooks/connect
+GET /api/integrations/quickbooks/callback?code=...&realmId=...</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>An authorized admin can initiate the QuickBooks connection flow.</li>
+              <li>After successful authorization, the connected company realm id and token metadata are stored.</li>
+              <li>If authorization fails or is cancelled, the application displays a clear failure status without storing partial credentials.</li>
+              <li>The application can detect and report whether QuickBooks is currently connected.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.3 – Synchronize QuickBooks customers into the application</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want QuickBooks customers synchronized into the application so that calibration jobs and reports can be associated with the correct business customer without duplicate manual entry.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Customer Sync</span><span class="chip">Master Data</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Create a sync process to import customer id, display name, company name, email, phone, and active status.</li>
+              <li>Store QuickBooks external ids to prevent duplicates.</li>
+              <li>Support manual re-sync from the UI.</li>
+            </ul>
+            <pre>{
+  "quickBooksCustomerId": "123",
+  "displayName": "Acme Environmental Lab",
+  "primaryEmail": "ap@acme.com",
+  "primaryPhone": "555-0100",
+  "active": true
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The sync process imports active QuickBooks customers into the application.</li>
+              <li>Existing synced customers are updated rather than duplicated.</li>
+              <li>Each synced customer record stores the QuickBooks customer id.</li>
+              <li>A sync run result shows how many customers were created, updated, skipped, or failed.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.4 – Link calibration groups and reports to a QuickBooks customer</div>
+          </div>
+          <div class="story-text">
+            As an analyst, I want to associate a calibration group or approved report with a QuickBooks customer so that downstream billing and customer reporting can reference the correct external account.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Linking</span><span class="chip">Workflow</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Add an optional QuickBooks customer reference on calibration groups or job records.</li>
+              <li>Allow selection from previously synced customers.</li>
+              <li>Persist both internal customer id and external QuickBooks customer id.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>A user can select a synced QuickBooks customer for a calibration group.</li>
+              <li>The selected customer remains visible on the group and report details.</li>
+              <li>If a linked QuickBooks customer becomes inactive, the system displays a warning but preserves the historical link.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.5 – Create QuickBooks invoice-ready line items from approved calibration work</div>
+          </div>
+          <div class="story-text">
+            As a product owner, I want approved calibration work translated into invoice-ready line items so that billing can be prepared in QuickBooks without re-entering completed work manually.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Billing</span><span class="chip">Approved Reports</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Define a mapping from approved calibration outputs to billable items or service lines.</li>
+              <li>Support quantity, rate, description, customer, and report reference.</li>
+              <li>Require QA approval before billing payload creation.</li>
+            </ul>
+            <pre>{
+  "customerRef": { "value": "123" },
+  "line": [
+    {
+      "description": "VOC calibration report - MS4 - Group 2026-03-05",
+      "amount": 150.00,
+      "detailType": "SalesItemLineDetail",
+      "salesItemLineDetail": {
+        "qty": 1,
+        "unitPrice": 150.00,
+        "itemRef": { "value": "45" }
+      }
+    }
+  ]
+}</pre>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Only approved calibration groups can generate invoice-ready data.</li>
+              <li>The generated billing payload includes customer reference, line description, quantity, and amount.</li>
+              <li>The billing description includes a report or calibration group reference for traceability.</li>
+              <li>The application stores whether invoice payload generation succeeded or failed.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.6 – Create invoices in QuickBooks from approved calibration work</div>
+          </div>
+          <div class="story-text">
+            As a billing user, I want the application to create an invoice in QuickBooks from approved calibration work so that billing is completed in the accounting system without manual duplicate entry.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Invoice Creation</span><span class="chip">Finance</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Submit invoice payloads to QuickBooks for the linked customer.</li>
+              <li>Store QuickBooks invoice id, sync timestamp, and status.</li>
+              <li>Prevent duplicate invoice creation for the same approved calibration group unless explicitly overridden.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>An invoice can be created only for a calibration group linked to a synced QuickBooks customer.</li>
+              <li>Successful invoice creation stores the QuickBooks invoice id on the calibration group or billing record.</li>
+              <li>If invoice creation fails, the user sees the failure reason and no duplicate invoice record is stored as successful.</li>
+              <li>A second invoice attempt for the same calibration group is blocked unless the previous attempt failed or an authorized override is used.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.7 – Sync invoice status back from QuickBooks</div>
+          </div>
+          <div class="story-text">
+            As a billing user, I want invoice status synchronized from QuickBooks so that I can see whether a calibration-related invoice is draft, sent, paid, or outstanding without leaving the application.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Invoice Sync</span><span class="chip">Status</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Read invoice status, balance, total amount, and last sync timestamp from QuickBooks.</li>
+              <li>Provide a manual refresh action and optionally scheduled sync support in a later phase.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>The application can retrieve invoice status for invoices it previously created or linked.</li>
+              <li>Invoice status, total, and balance are stored and displayed in the UI.</li>
+              <li>If QuickBooks is unavailable, the previous status remains visible with a clear sync failure message.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.8 – Record QuickBooks synchronization activity in the audit log</div>
+          </div>
+          <div class="story-text">
+            As a QA reviewer, I want QuickBooks synchronization events audited so that all accounting-related side effects can be traced and investigated when needed.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Audit</span><span class="chip">Compliance</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Audit connection actions, customer syncs, invoice generation, invoice creation, and invoice status refresh events.</li>
+              <li>Store initiating user, entity id, QuickBooks external id, timestamp, and outcome.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Each QuickBooks integration action creates an audit log entry.</li>
+              <li>Audit entries indicate success or failure and include the affected local record id.</li>
+              <li>QA and Admin users can review QuickBooks-related audit events.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="story">
+          <div class="story-head">
+            <div class="story-id">Story 17.9 – Add automated tests for QuickBooks integration workflows</div>
+          </div>
+          <div class="story-text">
+            As a developer, I want automated tests for QuickBooks integration workflows so that connection, sync, and invoice behavior remain stable as the application evolves.
+          </div>
+          <div class="meta">
+            <span class="chip">QuickBooks</span><span class="chip">Testing</span><span class="chip">Integration</span>
+          </div>
+          <div class="section">
+            <div class="section-title">Implementation Notes</div>
+            <ul>
+              <li>Mock QuickBooks API responses for OAuth, customer sync, invoice creation, and invoice status retrieval.</li>
+              <li>Test both success and failure paths.</li>
+              <li>Test duplicate invoice prevention logic.</li>
+            </ul>
+          </div>
+          <div class="acceptance">
+            <div class="section-title">Acceptance Criteria</div>
+            <ul>
+              <li>Automated tests cover successful QuickBooks connection flow.</li>
+              <li>Automated tests cover customer sync create and update scenarios.</li>
+              <li>Automated tests cover invoice creation success, invoice creation failure, and duplicate prevention.</li>
+              <li>Automated tests verify audit entries are written for QuickBooks actions.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <div class="footer-note">
+      These hour estimates are planning estimates, not guarantees. They assume an experienced full-stack .NET developer familiar with EF Core, auth, and third-party integrations. They do not include long external review cycles, production access delays, or major scope changes discovered during implementation.
+    </div>
+  </div>
+</body>
+</html>
