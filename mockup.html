@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WLTR Calibration Analytics – UI Mockup</title>
+<style>
+:root {
+  --bg:#f0f2f5; --card:#fff; --sidebar:#1b2a3d; --sidebar-hover:#263d56;
+  --primary:#1976d2; --primary-dark:#1565c0; --accent:#43a047;
+  --danger:#d32f2f; --warn:#f9a825; --muted:#78909c; --text:#212121;
+  --border:#dde3ea; --soft:#f7f9fc; --code:#eef3f8;
+  --teal:#009688; --brown:#795548; --orange:#ef6c00; --yellow:#f9a825;
+  --pass:#2e7d32; --fail:#c62828;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;overflow-x:hidden}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--sidebar);color:#cfd8dc;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .2s}
+.sidebar .logo{padding:20px 18px;font-size:20px;font-weight:800;color:#fff;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar .logo span{color:var(--primary);font-weight:400}
+.sidebar nav{flex:1;overflow-y:auto;padding:8px 0}
+.sidebar nav a{display:flex;align-items:center;gap:10px;padding:10px 18px;color:#b0bec5;text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:all .15s}
+.sidebar nav a:hover{background:var(--sidebar-hover);color:#fff}
+.sidebar nav a.active{background:var(--sidebar-hover);color:#fff;border-left-color:var(--primary)}
+.sidebar nav a .icon{font-size:16px;width:20px;text-align:center}
+.sidebar nav .section-label{padding:18px 18px 6px;font-size:10.5px;text-transform:uppercase;letter-spacing:1.5px;color:#546e7a}
+.sidebar .user-box{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;display:flex;align-items:center;gap:10px}
+.sidebar .user-box .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.main{margin-left:240px;flex:1;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar h1{font-size:18px;font-weight:600}
+.topbar .breadcrumb{font-size:12.5px;color:var(--muted)}
+.topbar .breadcrumb a{color:var(--primary);text-decoration:none}
+.content{padding:24px 28px 60px}
+
+/* Common */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.card h2{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h3{font-size:14px;font-weight:600;margin:14px 0 8px;color:#37474f}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.stat-card .num{font-size:28px;font-weight:700;color:var(--primary)}
+.stat-card .label{font-size:12px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-pass{background:#e8f5e9;color:var(--pass)}
+.badge-fail{background:#ffebee;color:var(--fail)}
+.badge-warn{background:#fff8e1;color:#e65100}
+.badge-info{background:#e3f2fd;color:var(--primary)}
+.badge-draft{background:#eceff1;color:#546e7a}
+.badge-role{background:#ede7f6;color:#5e35b1}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-success{background:var(--accent);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{background:var(--soft)}
+.btn-sm{padding:5px 12px;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--soft);font-weight:600;text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#fafbfc}
+input,select,textarea{border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit;width:100%}
+textarea{resize:vertical;min-height:120px;font-family:'Consolas','Courier New',monospace}
+label{font-size:12.5px;font-weight:600;display:block;margin-bottom:4px;color:#455a64}
+.form-group{margin-bottom:14px}
+.form-row{display:flex;gap:14px}
+.form-row>*{flex:1}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;margin-right:4px}
+.flow-arrow{text-align:center;padding:8px;font-size:22px;color:var(--muted)}
+.hidden{display:none!important}
+.text-pass{color:var(--pass);font-weight:600}
+.text-fail{color:var(--fail);font-weight:600}
+.text-muted{color:var(--muted)}
+.text-primary{color:var(--primary)}
+.mono{font-family:'Consolas','Courier New',monospace}
+
+/* Model colors matching lab workbook convention */
+.model-teal{color:var(--teal)}.bg-teal{background:var(--teal);color:#fff}
+.model-brown{color:var(--brown)}.bg-brown{background:var(--brown);color:#fff}
+.model-orange{color:var(--orange)}.bg-orange{background:var(--orange);color:#fff}
+.model-yellow{color:#8d6e00}.bg-yellow{background:var(--yellow);color:#000}
+
+/* DVD color cells */
+td.pt-pass{background:#e8f5e9}
+td.pt-fail{background:#ffebee;color:var(--fail);font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-swatch{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
+
+/* Workflow stepper */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:24px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:12.5px;font-weight:600;background:#eceff1;color:#546e7a;white-space:nowrap}
+.step.active{background:var(--primary);color:#fff}
+.step.done{background:#e8f5e9;color:var(--pass)}
+.step-arrow{padding:0 4px;color:#b0bec5;font-size:16px}
+
+/* Screen transitions */
+.screen{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Annotation tooltips */
+.tip{position:relative;cursor:help;border-bottom:1px dashed #90a4ae}
+.tip::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:#263d56;color:#fff;font-size:12px;font-weight:400;line-height:1.45;
+  padding:10px 14px;border-radius:8px;width:max-content;max-width:340px;
+  white-space:normal;pointer-events:none;opacity:0;transition:opacity .18s;
+  z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.22);text-align:left;
+}
+.tip::before{
+  content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:#263d56;
+  opacity:0;transition:opacity .18s;z-index:999;pointer-events:none;
+}
+.tip:hover::after,.tip:hover::before{opacity:1}
+.tip-right::after{left:0;transform:none}
+.tip-right::before{left:14px;transform:none}
+.tip-left::after{left:auto;right:0;transform:none}
+.tip-left::before{left:auto;right:14px;transform:none}
+.tip-below::after{bottom:auto;top:calc(100% + 8px)}
+.tip-below::before{bottom:auto;top:calc(100% + 2px);border-top-color:transparent;border-bottom-color:#263d56}
+.info-dot{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e3f2fd;color:var(--primary);font-size:10px;font-weight:700;margin-left:4px;vertical-align:middle;cursor:help;flex-shrink:0}
+.annotation-bar{background:#e3f2fd;border:1px solid #bbdefb;border-radius:8px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:#1565c0;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.annotation-bar .ab-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* Print */
+@media print{.sidebar,.topbar{display:none}.main{margin-left:0}.tip::after,.tip::before{display:none}.annotation-bar{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">WLTR <span>Analytics</span></div>
+    <nav>
+      <div class="section-label" title="Core calibration workflow screens — used daily by Analysts">Main</div>
+      <a href="#" class="active" onclick="show('dashboard')" id="nav-dashboard" title="Overview of workflow status, recent groups, and action items"><span class="icon">&#9632;</span> Dashboard</a>
+      <a href="#" onclick="show('upload')" id="nav-upload" title="Paste or upload raw instrument text files"><span class="icon">&#8682;</span> Upload Run</a>
+      <a href="#" onclick="show('mapping')" id="nav-mapping" title="Resolve unmatched compound names to canonical analytes"><span class="icon">&#8644;</span> Analyte Mapping</a>
+      <a href="#" onclick="show('group')" id="nav-group" title="Assemble CAL runs + ICV into a calibration group"><span class="icon">&#9881;</span> Calibration Groups</a>
+      <a href="#" onclick="show('dvd')" id="nav-dvd" title="Data Validation Dashboard — compare regression models, exclude points, verify ICV"><span class="icon">&#9733;</span> DVD / Regression</a>
+      <a href="#" onclick="show('report')" id="nav-report" title="Printable pass/fail report for all analytes"><span class="icon">&#9776;</span> Summary Report</a>
+      <a href="#" onclick="show('approval')" id="nav-approval" title="QA review, approve (lock), or reject calibration groups"><span class="icon">&#10003;</span> QA Approval</a>
+      <div class="section-label" title="Administration screens — typically Admin role only">Admin</div>
+      <a href="#" onclick="show('labsetup')" id="nav-labsetup" title="Register laboratory, technicians, and instruments (prerequisite)"><span class="icon">&#9960;</span> Lab Setup</a>
+      <a href="#" onclick="show('users')" id="nav-users" title="Create users, assign/remove roles (Admin only)"><span class="icon">&#9782;</span> User Management</a>
+      <a href="#" onclick="show('config')" id="nav-config" title="Configure method thresholds, regression defaults, cal levels (Admin only)"><span class="icon">&#9874;</span> Method Config</a>
+      <a href="#" onclick="show('quickbooks')" id="nav-quickbooks" title="QuickBooks Online OAuth connection, customer sync, invoice status"><span class="icon">$</span> QuickBooks</a>
+      <a href="#" onclick="show('audit')" id="nav-audit" title="Immutable log of all system actions for regulatory compliance"><span class="icon">&#128270;</span> Audit Log</a>
+    </nav>
+    <div class="user-box">
+      <div class="avatar">RA</div>
+      <div><strong style="color:#fff">Robert A.</strong><br/>Analyst</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="breadcrumb" id="breadcrumb"><a href="#" onclick="show('dashboard')">Home</a></div>
+        <h1 id="page-title">Dashboard</h1>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <!-- Navigation link back to the Scrum Backlog document -->
+        <!-- This link allows users to return to the project backlog (index.html) -->
+        <!-- which contains detailed epics, stories, and implementation estimates -->
+        <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--soft);border:1px solid var(--border);border-radius:6px;text-decoration:none;color:var(--primary);font-size:12px;font-weight:600;transition:all .15s" title="Return to Scrum Backlog - View project epics, stories, and implementation estimates" onmouseover="this.style.background='#e3f2fd'" onmouseout="this.style.background='var(--soft)'">
+          📋 Backlog
+        </a>
+        <span style="font-size:12px;color:var(--muted)">Precision Environmental Labs</span>
+        <span class="badge badge-info">v1.0</span>
+      </div>
+    </div>
+    <div class="content">
+
+    <!-- ==================== WORKFLOW FLOW OVERVIEW ==================== -->
+    <div id="screen-dashboard" class="screen">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Dashboard:</strong> The landing screen after login. Shows the 7-step calibration workflow, key metrics, recent groups, and action items. Click any step in the stepper or any sidebar link to navigate. Hover over dotted-underline text for detailed explanations.</div>
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,#1b2a3d,#263d56);color:#fff;border:none">
+        <h2 style="color:#fff">&#9889; Application Workflow Overview</h2>
+        <p style="color:#b0bec5;margin-bottom:16px">Complete flow from lab setup to approved calibration report</p>
+        <div class="stepper">
+          <div class="step done" onclick="show('labsetup')"><span class="tip tip-below" data-tip="One-time setup: Admin registers the laboratory (name, address, accreditation) and creates technician profiles. Nothing else works until this is done." style="color:inherit;border:0">1. Lab Setup</span></div><span class="step-arrow">&#8594;</span>
+          <div class="step done" onclick="show('upload')"><span class="tip tip-below" data-tip="Analyst pastes or uploads raw instrument text from GC/MS, IC, FID, or ICP-MS. The parser extracts metadata and compound result rows." style="color:inherit;border:0">2. Upload Runs</span></div><span class="step-arrow">&#8594;</span>
+          <div class="step done" onclick="show('mapping')"><span class="tip tip-below" data-tip="If the parser finds compound names it doesn't recognize, the analyst maps them to canonical analytes and saves them as aliases for future use." style="color:inherit;border:0">3. Analyte Mapping</span></div><span class="step-arrow">&#8594;</span>
+          <div class="step done" onclick="show('group')"><span class="tip tip-below" data-tip="Analyst selects multiple CAL runs (one per concentration level) and an optional ICV run, then validates readiness before computing." style="color:inherit;border:0">4. Build Group</span></div><span class="step-arrow">&#8594;</span>
+          <div class="step active" onclick="show('dvd')"><span class="tip tip-below" data-tip="The core analytical screen. The system computes all 9 regression models per analyte simultaneously. The analyst compares models, excludes outlier points, and selects the best model per analyte." style="color:inherit;border:0">5. Compute / DVD</span></div><span class="step-arrow">&#8594;</span>
+          <div class="step" onclick="show('report')"><span class="tip tip-below" data-tip="A printable report showing pass/fail for every analyte against configured thresholds (RSE, R-squared, %Diff, ICV). Exportable as PDF or CSV." style="color:inherit;border:0">6. Summary Report</span></div><span class="step-arrow">&#8594;</span>
+          <div class="step" onclick="show('approval')"><span class="tip tip-below" data-tip="A QA-role user reviews the results, adds a comment, and either approves (locking all data permanently) or rejects (returning to the analyst for correction)." style="color:inherit;border:0">7. QA Approval</span></div>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <div class="stat-card"><div class="num">3</div><div class="label"><span class="tip" data-tip="Physical lab instruments (GC/MS, IC, FID, ICP-MS) registered in the system and currently operational.">Instruments Active</span></div></div>
+        <div class="stat-card"><div class="num">12</div><div class="label"><span class="tip" data-tip="A CAL run = one instrument run at one concentration level. Each run contains response data for all analytes in the method (e.g., 72 VOCs).">CAL Runs Today</span></div></div>
+        <div class="stat-card"><div class="num">4</div><div class="label"><span class="tip" data-tip="Calibration groups that have been computed but not yet reviewed and approved by a QA-role user.">Groups Pending QA</span></div></div>
+        <div class="stat-card"><div class="num">28</div><div class="label"><span class="tip" data-tip="Calibration reports approved by QA this month. Approved reports are permanently locked and serve as auditable records.">Reports Approved (MTD)</span></div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Recent Calibration Groups</h2>
+          <table>
+            <tr><th><span class="tip" data-tip="A calibration group bundles all CAL runs at different concentration levels (plus optional ICV) for one instrument into a single unit for regression analysis.">Group</span></th><th>Instrument</th><th>Analytes</th><th><span class="tip" data-tip="Draft = runs added but not computed. Computed = regression done, awaiting QA. Approved = QA-locked and immutable.">Status</span></th><th>Date</th></tr>
+            <tr><td>GRP-2026-0312</td><td><span class="tip" data-tip="GC/MS = Gas Chromatography Mass Spectrometry. Used for EPA 8260C volatile organic compounds (72 analytes).">MS4 (GC/MS)</span></td><td>72</td><td><span class="badge badge-pass">Approved</span></td><td>Mar 8</td></tr>
+            <tr><td>GRP-2026-0311</td><td><span class="tip" data-tip="FID = Flame Ionization Detector. Typically measures a smaller set of compounds like BTEX.">FID5 (FID)</span></td><td>3</td><td><span class="badge badge-pass">Approved</span></td><td>Mar 7</td></tr>
+            <tr><td>GRP-2026-0310</td><td><span class="tip" data-tip="IC = Ion Chromatography. Measures anions like fluoride, chloride, sulfate, nitrate.">IC1 (IC)</span></td><td>7</td><td><span class="badge badge-info">Computed</span></td><td>Mar 6</td></tr>
+            <tr><td>GRP-2026-0309</td><td>MS4 (GC/MS)</td><td>72</td><td><span class="badge badge-draft">Draft</span></td><td>Mar 5</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h2>Action Items</h2>
+          <table>
+            <tr><th>Task</th><th>Details</th><th>Priority</th></tr>
+            <tr><td><span class="tip" data-tip="Raw compound names from instrument text that the system couldn't automatically match to a canonical analyte. Must be resolved before the group can be computed.">Resolve unmatched analytes</span></td><td>3 compounds in Run #1047</td><td><span class="badge badge-warn">Medium</span></td></tr>
+            <tr><td><span class="tip" data-tip="A computed group is waiting for a QA-role user to review and either approve (lock) or reject (return to analyst).">QA review pending</span></td><td>GRP-2026-0310 (IC1)</td><td><span class="badge badge-fail">High</span></td></tr>
+            <tr><td><span class="tip" data-tip="ICV (Initial Calibration Verification) is a second-source standard used to independently verify the calibration curve's accuracy. Optional but strongly recommended.">ICV verification needed</span></td><td>GRP-2026-0309 missing ICV</td><td><span class="badge badge-warn">Medium</span></td></tr>
+            <tr><td><span class="tip" data-tip="After QA approval, the system can generate QuickBooks invoices for the client. These invoices are waiting to be synced.">QuickBooks sync</span></td><td>3 invoices pending</td><td><span class="badge badge-info">Low</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== LAB SETUP ==================== -->
+    <div id="screen-labsetup" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Lab Setup (Prerequisite):</strong> This is the first thing an Admin must complete. The system blocks all calibration workflows (upload, compute, approve) until a Laboratory record and at least one Lab Technician profile exist. This ensures every run is traceable to a real lab and a qualified person.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--primary)">
+        <h2>&#9960; Lab Setup <span class="tip" data-tip="PREREQUISITE means no other workflow screens are usable until this setup is done. The API enforces this — analytics endpoints return 403 if lab/technician records are missing."><span class="badge badge-info">PREREQUISITE</span></span></h2>
+        <p style="color:var(--muted);margin-bottom:16px">Laboratory details and technician profiles must be configured before any analytics workflow can begin.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h2>Laboratory Details</h2>
+          <div class="form-group"><label>Laboratory Name</label><input value="Precision Environmental Labs" /></div>
+          <div class="form-row">
+            <div class="form-group"><label>Address</label><input value="4520 Industrial Pkwy" /></div>
+            <div class="form-group"><label>City / State / ZIP</label><input value="Wichita, KS 67226" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label><span class="tip tip-below" data-tip="TNI (The NELAC Institute) accreditation ID. This is the lab's official certification number proving it meets quality standards for environmental testing.">Accreditation ID</span></label><input value="TNI-KS-2024-0892" /></div>
+            <div class="form-group"><label>Contact Phone</label><input value="(316) 555-0142" /></div>
+          </div>
+          <div class="form-group"><label>Contact Email</label><input value="lab-director@precisionenv.com" /></div>
+          <button class="btn btn-primary">Save Laboratory</button>
+        </div>
+        <div class="card">
+          <h2><span class="tip" data-tip="Each Lab Technician profile links an application user to the physical lab. A technician record is required to upload runs — the system records WHO performed each calibration for audit traceability.">Lab Technicians</span></h2>
+          <table>
+            <tr><th>Name</th><th><span class="tip" data-tip="Application role (Admin, Analyst, QA, Viewer). Determines what actions the user can perform. Assigned by Admin on the User Management screen.">Role</span></th><th>Status</th><th></th></tr>
+            <tr><td>Robert A.</td><td><span class="badge badge-role">Analyst</span></td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Raina M.</td><td><span class="badge badge-role">Analyst</span></td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Nathan B.</td><td><span class="badge badge-role">Analyst</span></td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Walter R.</td><td><span class="badge badge-role">Admin</span> <span class="badge badge-role">QA</span></td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+          </table>
+          <br/><button class="btn btn-outline">+ Add Technician</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2><span class="tip tip-below" data-tip="Physical instruments in the lab. Each instrument belongs to this Laboratory and has a specific text output format the system's parsers understand. Runs are always tied to one instrument.">Instruments</span></h2>
+        <table>
+          <tr><th>ID</th><th>Name</th><th><span class="tip" data-tip="Instrument type determines which parser is used. GC/MS = Agilent text format. IC = Metrohm MagicNet SLK/CSV. FID = Agilent OpenLab CSV. ICP-MS = Agilent ICP-MS format.">Type</span></th><th>Manufacturer</th><th>Model</th><th>Status</th></tr>
+          <tr><td>INST-001</td><td>MS4</td><td><span class="tip" data-tip="Gas Chromatography/Mass Spectrometry. Primary instrument for EPA 8260C volatile organic compound analysis. Outputs Agilent-format text with compound rows including RT, QIon, Response, and Calculated Concentration.">GC/MS</span></td><td>Agilent</td><td>5977B</td><td><span class="badge badge-pass">Active</span></td></tr>
+          <tr><td>INST-002</td><td>FID5</td><td><span class="tip" data-tip="Flame Ionization Detector. Often used for a small set of target compounds (e.g., BTEX). Outputs Agilent OpenLab CSV format.">FID</span></td><td>Agilent</td><td>8890</td><td><span class="badge badge-pass">Active</span></td></tr>
+          <tr><td>INST-003</td><td>IC1</td><td><span class="tip" data-tip="Ion Chromatography. Measures anions (fluoride, chloride, nitrate, sulfate, etc.). Outputs Metrohm MagicNet SLK or CSV format.">IC</span></td><td>Metrohm</td><td>940 Pro</td><td><span class="badge badge-pass">Active</span></td></tr>
+          <tr><td>INST-004</td><td>ICP-MS1</td><td><span class="tip" data-tip="Inductively Coupled Plasma Mass Spectrometry. Measures trace metals at parts-per-trillion levels. Currently offline for maintenance.">ICP-MS</span></td><td>Thermo</td><td>iCAP RQ</td><td><span class="badge badge-draft">Maintenance</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== UPLOAD RUN ==================== -->
+    <div id="screen-upload" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Upload Run:</strong> An Analyst pastes (or uploads) the raw text output from a lab instrument. The system's parser identifies the format, extracts metadata (operator, method, date), and breaks the text into individual compound result rows. The raw text is stored immutably with a SHA-256 hash for data integrity.</div>
+      </div>
+      <div class="stepper">
+        <div class="step done">1. Lab Setup</div><span class="step-arrow">&#8594;</span>
+        <div class="step active">2. Upload Runs</div><span class="step-arrow">&#8594;</span>
+        <div class="step">3. Analyte Mapping</div><span class="step-arrow">&#8594;</span>
+        <div class="step">4. Build Group</div><span class="step-arrow">&#8594;</span>
+        <div class="step">5. Compute</div><span class="step-arrow">&#8594;</span>
+        <div class="step">6. Report</div><span class="step-arrow">&#8594;</span>
+        <div class="step">7. Approve</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h2>&#8682; Upload / Paste Raw Instrument Text</h2>
+          <div class="form-row">
+            <div class="form-group"><label><span class="tip tip-below" data-tip="CAL = calibration run at a known concentration. Used to build the calibration curve. ICV = Initial Calibration Verification, a second-source standard at a known concentration used to independently verify the curve.">Run Type</span></label><select><option>CAL (Calibration)</option><option>ICV (Verification)</option></select></div>
+            <div class="form-group"><label><span class="tip tip-below" data-tip="Select which physical instrument produced this data. Determines which text parser is used and which Method Config applies.">Instrument</span></label><select><option>MS4 — GC/MS (Agilent)</option><option>FID5 — FID (Agilent)</option><option>IC1 — IC (Metrohm)</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label><span class="tip tip-below" data-tip="The known true concentration for this calibration standard (e.g., 10 ppb). Multiple runs at different levels build a multi-point calibration curve. Defined in Method Config.">Calibration Level</span></label><select><option>Cal_0.1ppb</option><option>Cal_1ppb</option><option selected>Cal_10ppb</option><option>Cal_50ppb</option><option>Cal_100ppb</option><option>Cal_200ppb</option></select></div>
+            <div class="form-group"><label>Run Date</label><input type="date" value="2026-03-10" /></div>
+          </div>
+          <div class="form-group">
+            <label><span class="tip tip-below" data-tip="The exact text output from the instrument software. This is stored immutably — once saved, the original text can never be modified. A SHA-256 hash is computed for tamper detection.">Raw Instrument Text</span></label>
+            <textarea rows="10">Data Path : D:\MassHunter\GCMS\1\data\2026\Mar\
+Data File : 0310_CAL10.D
+Acq On    : 10 Mar 2026   8:42 am
+Operator  : Robert A.
+Instrument: MS4
+Method    : EPA8260C_VOC.M
+Sample    : Cal_10ppb
+
+=====================================================================
+Compound                       R.T.  QIon  Response   Calc Conc
+=====================================================================
+Dichlorodifluoromethane        1.82   85    4562       9.87
+Chloromethane                  2.14   50    3891      10.12
+Vinyl chloride                 2.31   62    5234      10.34
+Bromomethane                   2.67   94    2876       9.65
+Chloroethane                   2.89   64    4123      10.21
+...</textarea>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary">Parse &amp; Preview</button>
+            <button class="btn btn-outline">Upload File Instead</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Parsed Preview</h2>
+          <div style="background:#e8f5e9;border-radius:6px;padding:10px;margin-bottom:12px;font-size:13px">
+            <strong>Parse Status:</strong> <span class="text-pass">Valid</span> &mdash; 72 compounds parsed, 0 warnings
+          </div>
+          <h3><span class="tip tip-below" data-tip="The parser automatically extracts these fields from the header of the instrument text. Metadata identifies the operator, method, and file path without manual data entry.">Metadata Extracted</span></h3>
+          <table>
+            <tr><td style="width:140px;font-weight:600">Data Path</td><td class="mono" style="font-size:12px">D:\MassHunter\GCMS\1\data\2026\Mar\</td></tr>
+            <tr><td style="font-weight:600">Operator</td><td>Robert A.</td></tr>
+            <tr><td style="font-weight:600"><span class="tip" data-tip="The EPA analytical method used (e.g., 8260C for volatile organics). Determines which analytes, thresholds, and acceptance criteria apply.">Method</span></td><td>EPA8260C_VOC.M</td></tr>
+            <tr><td style="font-weight:600"><span class="tip" data-tip="A SHA-256 cryptographic hash of the raw text. If the text is modified after upload, the hash won't match — providing tamper-evident data integrity.">Text Hash (SHA-256)</span></td><td class="mono" style="font-size:11px">a7f3c9...e2d1b8</td></tr>
+          </table>
+          <h3>Compound Rows (showing first 6 of 72)</h3>
+          <table>
+            <tr><th>Compound</th><th><span class="tip" data-tip="Retention Time — how many minutes it took the compound to travel through the chromatographic column. Used to identify compounds.">RT</span></th><th><span class="tip" data-tip="Quantification Ion — the specific mass-to-charge ratio used for quantitation on the mass spectrometer.">QIon</span></th><th><span class="tip" data-tip="The instrument's raw signal intensity for this compound. Higher response = more compound detected. This is the Y-axis value for the calibration curve.">Response</span></th><th><span class="tip" data-tip="Concentration calculated by the instrument's internal software. WLTR recalculates this using its own regression engine for independent verification.">Conc</span></th><th><span class="tip" data-tip="Whether the raw compound name was matched to a canonical analyte in the system's analyte registry. 'Unmatched' items must be resolved on the Analyte Mapping screen.">Mapped</span></th></tr>
+            <tr><td>Dichlorodifluoromethane</td><td>1.82</td><td>85</td><td>4,562</td><td>9.87</td><td><span class="badge badge-pass">Yes</span></td></tr>
+            <tr><td>Chloromethane</td><td>2.14</td><td>50</td><td>3,891</td><td>10.12</td><td><span class="badge badge-pass">Yes</span></td></tr>
+            <tr><td>Vinyl chloride</td><td>2.31</td><td>62</td><td>5,234</td><td>10.34</td><td><span class="badge badge-pass">Yes</span></td></tr>
+            <tr><td>Bromomethane</td><td>2.67</td><td>94</td><td>2,876</td><td>9.65</td><td><span class="badge badge-pass">Yes</span></td></tr>
+            <tr><td>Chloroethane</td><td>2.89</td><td>64</td><td>4,123</td><td>10.21</td><td><span class="badge badge-pass">Yes</span></td></tr>
+            <tr><td style="color:var(--warn)">Unknown-Cmpd-X42</td><td>5.44</td><td>91</td><td>1,203</td><td>--</td><td><span class="badge badge-warn">Unmatched</span></td></tr>
+          </table>
+          <br/>
+          <button class="btn btn-success" onclick="show('mapping')">Confirm &amp; Save Run</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ANALYTE MAPPING ==================== -->
+    <div id="screen-mapping" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Analyte Mapping:</strong> Different instruments and methods may use different names for the same compound (e.g., "DCM" vs "Dichloromethane"). This screen resolves ambiguity by letting the analyst map raw names to canonical analytes and save the mapping as a reusable alias. Once an alias is saved, future uploads auto-match.</div>
+      </div>
+      <div class="stepper">
+        <div class="step done">1. Lab Setup</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">2. Upload Runs</div><span class="step-arrow">&#8594;</span>
+        <div class="step active">3. Analyte Mapping</div><span class="step-arrow">&#8594;</span>
+        <div class="step">4. Build Group</div><span class="step-arrow">&#8594;</span>
+        <div class="step">5. Compute</div><span class="step-arrow">&#8594;</span>
+        <div class="step">6. Report</div><span class="step-arrow">&#8594;</span>
+        <div class="step">7. Approve</div>
+      </div>
+      <div class="card">
+        <h2>&#8644; Resolve Unmatched Compound Names</h2>
+        <p style="color:var(--muted);margin-bottom:16px">3 compound names from recent runs could not be matched to canonical analytes. Map them below or create new aliases.</p>
+        <table>
+          <tr><th><span class="tip" data-tip="The exact compound name as it appeared in the raw instrument text.">Raw Compound Name</span></th><th>Run</th><th><span class="tip" data-tip="The system suggests the closest matching canonical analyte using fuzzy string matching. The analyst confirms or selects a different match.">Suggested Match</span></th><th><span class="tip" data-tip="Fuzzy match confidence score. Higher = more likely correct. Below ~85% the analyst should verify carefully.">Confidence</span></th><th><span class="tip" data-tip="'Map & Save Alias' creates a permanent alias so this raw name auto-resolves in all future uploads.">Action</span></th></tr>
+          <tr>
+            <td><strong>Unknown-Cmpd-X42</strong></td><td>Run #1047 (MS4, Cal_10ppb)</td>
+            <td><select><option selected>1,1-Dichloroethane (91% match)</option><option>1,2-Dichloroethane</option><option>-- Create New Analyte --</option></select></td>
+            <td><span class="badge badge-pass">91%</span></td>
+            <td><button class="btn btn-primary btn-sm">Map &amp; Save Alias</button></td>
+          </tr>
+          <tr>
+            <td><strong>Dichloro-DFM</strong></td><td>Run #1045 (MS4, Cal_1ppb)</td>
+            <td><select><option selected>Dichlorodifluoromethane (95% match)</option><option>-- Create New --</option></select></td>
+            <td><span class="badge badge-pass">95%</span></td>
+            <td><button class="btn btn-primary btn-sm">Map &amp; Save Alias</button></td>
+          </tr>
+          <tr>
+            <td><strong>trans-1,3-DCP</strong></td><td>Run #1046 (MS4, Cal_50ppb)</td>
+            <td><select><option selected>trans-1,3-Dichloropropene (88% match)</option><option>cis-1,3-Dichloropropene</option></select></td>
+            <td><span class="badge badge-warn">88%</span></td>
+            <td><button class="btn btn-primary btn-sm">Map &amp; Save Alias</button></td>
+          </tr>
+        </table>
+      </div>
+      <div class="card">
+        <h2><span class="tip tip-below" data-tip="The alias registry is the growing dictionary of mappings from raw instrument names to canonical analytes. Each alias was created by an analyst and is reused automatically on all future uploads.">Existing Alias Registry</span> (showing 6 of 142)</h2>
+        <table>
+          <tr><th>Alias</th><th>Canonical Analyte</th><th>Created By</th><th>Date</th></tr>
+          <tr><td>DCM</td><td>Dichloromethane</td><td>Robert A.</td><td>Jan 15, 2026</td></tr>
+          <tr><td>MeCl</td><td>Chloromethane</td><td>Walter R.</td><td>Dec 3, 2025</td></tr>
+          <tr><td>Benz.</td><td>Benzene</td><td>Raina M.</td><td>Feb 20, 2026</td></tr>
+          <tr><td>TCE</td><td>Trichloroethylene</td><td>Robert A.</td><td>Jan 22, 2026</td></tr>
+          <tr><td>PCE</td><td>Tetrachloroethylene</td><td>Walter R.</td><td>Nov 10, 2025</td></tr>
+          <tr><td>EDB</td><td>1,2-Dibromoethane</td><td>Raina M.</td><td>Mar 1, 2026</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== CALIBRATION GROUP BUILDER ==================== -->
+    <div id="screen-group" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Calibration Group Builder:</strong> The analyst assembles a group by selecting multiple CAL runs (one per concentration level) and optionally attaching an ICV run. The system validates readiness before allowing regression computation. When "Compute" is clicked, the active Method Config is snapshotted (frozen) so future config changes don't retroactively affect this group's results.</div>
+      </div>
+      <div class="stepper">
+        <div class="step done">1. Lab Setup</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">2. Upload Runs</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">3. Analyte Mapping</div><span class="step-arrow">&#8594;</span>
+        <div class="step active">4. Build Group</div><span class="step-arrow">&#8594;</span>
+        <div class="step">5. Compute</div><span class="step-arrow">&#8594;</span>
+        <div class="step">6. Report</div><span class="step-arrow">&#8594;</span>
+        <div class="step">7. Approve</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h2>&#9881; Assemble Calibration Group</h2>
+          <div class="form-group"><label>Instrument</label><select><option selected>MS4 — GC/MS (Agilent 5977B)</option></select></div>
+          <h3>Select CAL Runs (check to include)</h3>
+          <table>
+            <tr><th style="width:30px"><input type="checkbox" checked/></th><th>Run</th><th><span class="tip" data-tip="Each calibration level represents a known concentration of the standard solution. Multiple levels at different concentrations define the calibration curve range.">Level</span></th><th><span class="tip" data-tip="The known (true) concentration of the calibration standard at this level, in ppb (parts per billion). This is the X-axis value for the calibration curve.">True Conc</span></th><th>Date</th><th>Status</th></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1040</td><td>Cal_0.1ppb</td><td>0.1</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1041</td><td>Cal_0.5ppb</td><td>0.5</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1042</td><td>Cal_1ppb</td><td>1.0</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1043</td><td>Cal_2ppb</td><td>2.0</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1044</td><td>Cal_5ppb</td><td>5.0</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1045</td><td>Cal_10ppb</td><td>10.0</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1046</td><td>Cal_20ppb</td><td>20.0</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1047</td><td>Cal_50ppb</td><td>50.0</td><td>Mar 10</td><td><span class="badge badge-warn">Warnings</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1048</td><td>Cal_100ppb</td><td>100.0</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+            <tr><td><input type="checkbox" checked/></td><td>#1049</td><td>Cal_200ppb</td><td>200.0</td><td>Mar 10</td><td><span class="badge badge-pass">Valid</span></td></tr>
+          </table>
+          <h3 style="margin-top:14px"><span class="tip tip-below" data-tip="ICV (Initial Calibration Verification) uses a DIFFERENT source standard than the calibration standards. By calculating the ICV concentration using the calibration curve and comparing to the known value, analysts verify the curve is accurate beyond just fitting itself. Optional but strongly recommended by EPA methods.">ICV Run (optional)</span></h3>
+          <select><option>-- Select ICV Run --</option><option selected>#1050 — ICV_10ppb (Mar 10, Valid)</option></select>
+        </div>
+        <div class="card">
+          <h2>Readiness Check</h2>
+          <div style="background:#e8f5e9;border-radius:8px;padding:16px;margin-bottom:14px">
+            <div style="font-size:18px;font-weight:700;color:var(--pass)">Ready to Compute</div>
+            <div style="color:var(--muted);font-size:13px;margin-top:4px">All validation checks passed</div>
+          </div>
+          <table>
+            <tr><td><span class="tip" data-tip="Minimum number of concentration levels required. Linear regression requires at least 5 points; quadratic requires at least 6.">CAL Runs</span></td><td><strong>10 levels</strong> (meets minimum of 5)</td><td class="text-pass">PASS</td></tr>
+            <tr><td><span class="tip" data-tip="Each concentration level should appear only once. Duplicate levels would mean two runs at the same concentration, which is invalid for calibration.">Level Duplicates</span></td><td>None detected</td><td class="text-pass">PASS</td></tr>
+            <tr><td><span class="tip" data-tip="All 72 compound names from the instrument text must be resolved to canonical analytes. Unmatched names block computation.">Analyte Mappings</span></td><td>72/72 resolved</td><td class="text-pass">PASS</td></tr>
+            <tr><td><span class="tip" data-tip="Internal Standards (IS) are spiked compounds used to normalize response ratios. The system auto-detects IS compounds (e.g., Fluorobenzene, Chlorobenzene-d5) from the parser output.">Internal Standards</span></td><td>3 IS detected (Fluorobenzene, etc.)</td><td class="text-pass">PASS</td></tr>
+            <tr><td>ICV Run</td><td>#1050 attached</td><td class="text-pass">PASS</td></tr>
+            <tr><td><span class="tip" data-tip="The Method Config defines all thresholds (RSE, R², %Diff limits, min points, etc.). When computation starts, the active config version is snapshotted and permanently linked to the group.">Method Config</span></td><td>EPA8260C v3 (active)</td><td class="text-pass">PASS</td></tr>
+          </table>
+          <br/>
+          <button class="btn btn-success" onclick="show('dvd')" style="width:100%;justify-content:center;padding:12px">
+            Compute Regression for All 72 Analytes
+          </button>
+          <p style="font-size:11.5px;color:var(--muted);margin-top:8px;text-align:center">This will snapshot MethodConfig v3 and compute all 9 mathematical models per analyte.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== DVD / REGRESSION DASHBOARD ==================== -->
+    <div id="screen-dvd" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>DVD / Regression Dashboard:</strong> The core analytical screen. "DVD" stands for Data Validation Dashboard. For each analyte, the system computes all 9 mathematical regression models simultaneously (3 types × 3 weighting schemes). The analyst compares %Diff values, R², RSE across models, can exclude outlier points, and selects the best-fit model. The ICV Calculator verifies the selected curve against an independent standard. All math is done server-side using manual formulas — no third-party math libraries.</div>
+      </div>
+      <div class="stepper">
+        <div class="step done">1. Lab Setup</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">2. Upload Runs</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">3. Analyte Mapping</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">4. Build Group</div><span class="step-arrow">&#8594;</span>
+        <div class="step active">5. Compute / DVD</div><span class="step-arrow">&#8594;</span>
+        <div class="step">6. Report</div><span class="step-arrow">&#8594;</span>
+        <div class="step">7. Approve</div>
+      </div>
+
+      <div class="card">
+        <h2>&#9733; DVD Regression Dashboard — GRP-2026-0312 (MS4)</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <label style="margin:0">Analyte:</label>
+            <select style="width:260px" id="analyte-select" onchange="switchAnalyte(this.value)">
+              <option value="benzene" selected>Benzene</option>
+              <option value="dcm">Dichloromethane</option>
+              <option value="fluoride">Fluoride</option>
+              <option value="tce">Trichloroethylene</option>
+            </select>
+            <span class="text-muted" style="font-size:12px">(72 analytes total)</span>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div><span class="tip" data-tip="Linear Least-Squares with Intercept, weighted 1/x. Gives more weight to lower-concentration points. Most commonly used for environmental data.">LS/IC (Linear 1/x)</span></div>
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--brown)"></div><span class="tip" data-tip="Linear Least-Squares with Intercept, weighted 1/x². Even stronger emphasis on low-concentration accuracy.">LS/IC2 (Linear 1/x&sup2;)</span></div>
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--orange)"></div><span class="tip" data-tip="Quadratic (second-order polynomial) with Intercept, weighted 1/x. Used when the response-vs-concentration curve is non-linear (e.g., at high concentrations).">QD/IC (Quadratic 1/x)</span></div>
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--yellow)"></div><span class="tip" data-tip="Quadratic with Intercept, weighted 1/x². Best low-end fit for non-linear responses. Often the highest-scoring model.">QD/IC2 (Quadratic 1/x&sup2;)</span></div>
+          </div>
+        </div>
+
+        <h3>Calibration Points &amp; %Diff by Model</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Red cells = point fails %Diff threshold (&plusmn;20%). Uncheck "Included" to exclude an outlier point — exclusion is audit-logged.</p>
+        <div style="overflow-x:auto">
+        <table>
+          <tr>
+            <th>Level</th><th><span class="tip" data-tip="Known standard concentration in ppb. The X-axis value for the calibration curve.">True Conc</span></th><th><span class="tip" data-tip="Raw instrument signal intensity. Higher response = more compound detected.">Response</span></th><th><span class="tip" data-tip="Response divided by the Internal Standard response. Normalizes for instrument drift and injection variability. This is what the regression actually fits.">Ratio</span></th>
+            <th style="color:var(--teal)"><span class="tip" data-tip="%Diff = ((calculated conc - true conc) / true conc) × 100. Shows how far the model's prediction deviates from the known value. Must be within ±20%.">LS/IC %Diff</span></th>
+            <th style="color:var(--brown)">LS/IC2 %Diff</th>
+            <th style="color:var(--orange)">QD/IC %Diff</th>
+            <th style="color:var(--yellow)">QD/IC2 %Diff</th>
+            <th><span class="tip" data-tip="Uncheck to exclude this calibration point from the regression. Useful for outliers at the low end. Exclusions are recorded in the audit log.">Included</span></th>
+          </tr>
+          <tr><td>Cal_0.1</td><td>0.1</td><td>456</td><td>0.026</td><td class="pt-fail">-28.4%</td><td class="pt-fail">-24.1%</td><td class="pt-pass">-12.3%</td><td class="pt-pass">-9.8%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_0.5</td><td>0.5</td><td>2,341</td><td>0.133</td><td class="pt-pass">-8.2%</td><td class="pt-pass">-5.1%</td><td class="pt-pass">-3.7%</td><td class="pt-pass">-2.1%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_1</td><td>1.0</td><td>4,892</td><td>0.278</td><td class="pt-pass">-3.1%</td><td class="pt-pass">-1.8%</td><td class="pt-pass">-1.2%</td><td class="pt-pass">-0.6%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_2</td><td>2.0</td><td>9,567</td><td>0.544</td><td class="pt-pass">1.2%</td><td class="pt-pass">0.8%</td><td class="pt-pass">0.4%</td><td class="pt-pass">0.2%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_5</td><td>5.0</td><td>23,890</td><td>1.358</td><td class="pt-pass">2.4%</td><td class="pt-pass">1.9%</td><td class="pt-pass">1.1%</td><td class="pt-pass">0.7%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_10</td><td>10.0</td><td>47,234</td><td>2.685</td><td class="pt-pass">-1.5%</td><td class="pt-pass">-0.9%</td><td class="pt-pass">-0.4%</td><td class="pt-pass">-0.1%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_20</td><td>20.0</td><td>95,678</td><td>5.440</td><td class="pt-pass">0.8%</td><td class="pt-pass">0.5%</td><td class="pt-pass">0.3%</td><td class="pt-pass">0.1%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_50</td><td>50.0</td><td>238,450</td><td>13.554</td><td class="pt-pass">-2.1%</td><td class="pt-pass">-1.4%</td><td class="pt-pass">-0.8%</td><td class="pt-pass">-0.3%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_100</td><td>100.0</td><td>471,230</td><td>26.789</td><td class="pt-pass">1.7%</td><td class="pt-pass">1.2%</td><td class="pt-pass">0.6%</td><td class="pt-pass">0.2%</td><td><input type="checkbox" checked/></td></tr>
+          <tr><td>Cal_200</td><td>200.0</td><td>952,100</td><td>54.123</td><td class="pt-pass">-0.9%</td><td class="pt-pass">-0.5%</td><td class="pt-pass">-0.2%</td><td class="pt-pass">-0.1%</td><td><input type="checkbox" checked/></td></tr>
+        </table>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3><span class="tip tip-below" data-tip="Side-by-side comparison of the same statistical metrics across all models for the selected analyte. Lets the analyst see which model best fits the data.">Model Comparison — Curve Statistics</span></h3>
+          <table>
+            <tr><th>Metric</th><th style="color:var(--teal)">LS/IC</th><th style="color:var(--brown)">LS/IC2</th><th style="color:var(--orange)">QD/IC</th><th style="color:var(--yellow)">QD/IC2</th><th>Threshold</th></tr>
+            <tr><td>Points Used</td><td>10</td><td>10</td><td>10</td><td>10</td><td>&ge; 5</td></tr>
+            <tr><td><span class="tip" data-tip="How many calibration points have %Diff exceeding the ±20% threshold. Method Config sets the maximum allowed failures (typically 0 or 1).">Points Failed</span></td><td class="text-fail">1</td><td class="text-fail">1</td><td>0</td><td>0</td><td>&le; 1</td></tr>
+            <tr><td><span class="tip" data-tip="RSD = Relative Standard Deviation (for Average model). RSE = Relative Standard Error (for regression models). Measures overall scatter of calibration points around the curve. Must be ≤ 15%.">RSD / RSE</span></td><td>8.42%</td><td>6.31%</td><td>4.18%</td><td>3.25%</td><td>&le; 15%</td></tr>
+            <tr><td><span class="tip" data-tip="R² (coefficient of determination) measures how well the regression line fits the data. 1.0 = perfect fit. Must be ≥ 0.995 for acceptance.">R&sup2;</span></td><td>0.99912</td><td>0.99954</td><td>0.99987</td><td>0.99993</td><td>&ge; 0.995</td></tr>
+            <tr><td><span class="tip" data-tip="The slope of the linear regression equation (y = mx + b). Only applicable to linear models. Represents the sensitivity — response per unit concentration.">Slope</span></td><td>0.2694</td><td>0.2701</td><td>--</td><td>--</td><td>--</td></tr>
+            <tr><td><span class="tip" data-tip="The Y-intercept of the regression line. Ideally close to zero. A large intercept can indicate systematic bias.">Intercept</span></td><td>-0.0043</td><td>-0.0028</td><td>--</td><td>--</td><td>--</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3><span class="tip tip-below" data-tip="The ICV Calculator is a critical verification tool. It uses the calibration curve equation to back-calculate the concentration from the ICV run's response, then compares to the known ICV concentration. This proves the curve works on independent data, not just on the data it was built from.">ICV Calculator — All Models at Once</span></h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:8px"><span class="tip" data-tip="The known concentration of the ICV standard, which is from a DIFFERENT source/lot than the calibration standards.">ICV True Concentration: <strong>10.0 ppb</strong></span> | Threshold: &plusmn;20%</p>
+          <table>
+            <tr><th>Model</th><th><span class="tip" data-tip="Concentration back-calculated from the ICV response using the model's calibration curve equation.">ICV Calc&rsquo;d</span></th><th><span class="tip" data-tip="%Diff = ((calculated - true) / true) × 100. Must be within ±20% for the model to pass ICV verification.">%Diff</span></th><th>Status</th></tr>
+            <tr><td style="color:var(--teal)"><strong>LS/IC</strong></td><td>10.24</td><td>2.4%</td><td><span class="badge badge-pass">PASS</span></td></tr>
+            <tr><td style="color:var(--brown)"><strong>LS/IC2</strong></td><td>10.11</td><td>1.1%</td><td><span class="badge badge-pass">PASS</span></td></tr>
+            <tr><td style="color:var(--orange)"><strong>QD/IC</strong></td><td>10.05</td><td>0.5%</td><td><span class="badge badge-pass">PASS</span></td></tr>
+            <tr><td style="color:var(--yellow)"><strong>QD/IC2</strong></td><td>10.02</td><td>0.2%</td><td><span class="badge badge-pass">PASS</span></td></tr>
+          </table>
+          <div style="background:var(--soft);padding:10px;border-radius:6px;margin-top:10px;font-size:12.5px">
+            <strong>Analyst Recommendation:</strong> All 4 models pass. LS/IC (teal) is the simplest passing model.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="tip tip-below" data-tip="The Report Card ranks all computed models by a composite score. The lab convention (from the legacy 'Walter's calculator' Excel workbook) is to prefer the SIMPLEST passing model — e.g., linear over quadratic — even if the quadratic scores higher. This preserves conservative, defensible results.">Report Card — Model Ranking</span></h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Higher score = better overall fit. Scores consider %Diff, RSE, R&sup2;, and point failures.</p>
+        <table>
+          <tr><th>Rank</th><th>Model</th><th><span class="tip" data-tip="Score based on how many calibration points pass the %Diff threshold. 10 = all pass.">Points Score</span></th><th><span class="tip" data-tip="Score inversely proportional to RSE. Lower RSE = higher score.">RSE Score</span></th><th><span class="tip" data-tip="Score based on R² value. Closer to 1.000 = higher score.">R&sup2; Score</span></th><th><span class="tip" data-tip="Score based on ICV %Diff. Closer to 0% = higher score.">ICV Score</span></th><th>Total</th><th>Selected</th></tr>
+          <tr style="background:#e8f5e9"><td>1</td><td style="color:var(--yellow)"><strong>QD/IC2</strong></td><td>10</td><td>10</td><td>10</td><td>10</td><td><strong>40</strong></td><td></td></tr>
+          <tr><td>2</td><td style="color:var(--orange)"><strong>QD/IC</strong></td><td>10</td><td>9</td><td>9</td><td>9</td><td><strong>37</strong></td><td></td></tr>
+          <tr><td>3</td><td style="color:var(--brown)"><strong>LS/IC2</strong></td><td>9</td><td>8</td><td>8</td><td>8</td><td><strong>33</strong></td><td></td></tr>
+          <tr style="background:#e3f2fd"><td>4</td><td style="color:var(--teal)"><strong>LS/IC</strong></td><td>9</td><td>7</td><td>7</td><td>7</td><td><strong>30</strong></td><td><span class="tip" data-tip="Although QD/IC2 scored highest, the lab convention is to pick the simplest passing model. LS/IC (linear, 1/x weighted) passes all criteria and is easier to defend in regulatory audits."><span class="badge badge-info">Selected (simplest passing)</span></span></td></tr>
+        </table>
+        <div style="margin-top:12px;display:flex;gap:10px">
+          <button class="btn btn-success" onclick="show('report')">Accept Selection &amp; View Report</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SUMMARY REPORT ==================== -->
+    <div id="screen-report" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Summary Report:</strong> A comprehensive, printable report showing pass/fail results for every analyte against the configured acceptance criteria. Mirrors the format from the legacy "Walter's calculator" Excel workbook. Exportable as PDF or CSV. This is what the analyst submits for QA review and what goes into the lab's permanent records.</div>
+      </div>
+      <div class="stepper">
+        <div class="step done">1. Lab Setup</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">2. Upload Runs</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">3. Analyte Mapping</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">4. Build Group</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">5. Compute</div><span class="step-arrow">&#8594;</span>
+        <div class="step active">6. Summary Report</div><span class="step-arrow">&#8594;</span>
+        <div class="step">7. Approve</div>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--primary)">
+        <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 style="margin-bottom:4px">Calibration Summary Report — GRP-2026-0312</h2>
+            <span class="text-muted" style="font-size:13px">Generated Mar 10, 2026 | Config: EPA8260C v3</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm">Export PDF</button>
+            <button class="btn btn-outline btn-sm">Export CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Report Header</h3>
+        <div class="grid-3" style="font-size:13px">
+          <div><strong>Instrument:</strong> MS4 (GC/MS, Agilent 5977B)</div>
+          <div><strong>Method:</strong> EPA8260C_VOC.M</div>
+          <div><strong>Operator:</strong> Robert A.</div>
+          <div><strong>Run Dates:</strong> Mar 10, 2026</div>
+          <div><strong>Config Version:</strong> <span class="tip" data-tip="This is a frozen snapshot of the Method Config at the time of computation. Even if the admin later changes the config to v4, this group retains v3's thresholds and settings permanently.">v3 (snapshot)</span></div>
+          <div><strong>Cal Points:</strong> 10 levels (0.1 – 200 ppb)</div>
+          <div><strong>ICV Source:</strong> Run #1050 (10 ppb)</div>
+          <div><strong>Approval:</strong> <span class="badge badge-warn">Pending QA</span></div>
+          <div><strong>Computation:</strong> Mar 10, 2026 10:42 AM</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="tip tip-below" data-tip="These thresholds come from the Method Config (snapshotted at computation time) and are based on EPA method requirements. Any analyte that fails one or more criteria is flagged as 'Not Acceptable'.">Page 1 — Acceptance Criteria (Reference Table)</span></h3>
+        <table>
+          <tr><th>Criterion</th><th>Threshold</th></tr>
+          <tr><td><span class="tip" data-tip="RSD for Average model, RSE for regression models. Measures overall scatter around the calibration curve.">RSD / RSE</span></td><td>&le; 15%</td></tr>
+          <tr><td><span class="tip" data-tip="How well the regression fits the data. 1.0 = perfect fit. EPA methods typically require ≥ 0.99 or ≥ 0.995.">Correlation Coefficient (R&sup2;)</span></td><td>&ge; 0.995</td></tr>
+          <tr><td><span class="tip" data-tip="The maximum number of individual calibration points that can fail the %Diff threshold and still have the analyte pass overall.">Max Allowable Cal Point Failures</span></td><td>&le; 1</td></tr>
+          <tr><td><span class="tip" data-tip="Average model (RSD-based) requires fewer points than regression models.">Min Cal Points (Average)</span></td><td>&ge; 4</td></tr>
+          <tr><td>Min Cal Points (Linear)</td><td>&ge; 5</td></tr>
+          <tr><td><span class="tip" data-tip="Quadratic models need more data points because they fit 3 coefficients (a, b, c) instead of 2.">Min Cal Points (Quadratic)</span></td><td>&ge; 6</td></tr>
+          <tr><td><span class="tip" data-tip="Maximum allowed deviation between the ICV back-calculated concentration and its known true value.">ICV %Diff Limit</span></td><td>&plusmn; 20%</td></tr>
+          <tr><td><span class="tip" data-tip="Maximum allowed deviation for each individual calibration point's back-calculated concentration vs. its true value.">Cal Point %Diff Limit</span></td><td>&plusmn; 20%</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="tip tip-below" data-tip="The main evaluation table. Each row is one analyte with its selected model. Y/N columns indicate pass/fail for each acceptance criterion. The 'Overall' column is the final determination: Acceptable = all criteria met.">Page 2 — Calibration Evaluation Table</span> (showing 8 of 72 analytes)</h3>
+        <div style="overflow-x:auto">
+        <table>
+          <tr><th>Analyte</th><th><span class="tip" data-tip="The regression model selected for this analyte. AVG = Average (RSD-based), LS = Linear, QD = Quadratic. IC = with intercept, FZ = forced-zero. Suffix = weighting.">Model</span></th><th>Pts Used</th><th>Pts Failed</th><th>RSD&le;15%</th><th>RSE&le;15%</th><th>R&sup2;&ge;.995</th><th>ICV %Diff</th><th>ICV&le;20%</th><th>CAL Status</th><th><span class="tip" data-tip="Acceptable = all criteria pass. Not Acceptable = one or more criteria fail. Analyst must change the model or exclude a point to resolve failures before QA submission.">Overall</span></th></tr>
+          <tr><td>Benzene</td><td>LS/IC</td><td>10</td><td>1</td><td class="text-pass">8.42% Y</td><td class="text-pass">6.18% Y</td><td class="text-pass">.9991 Y</td><td>2.4%</td><td class="text-pass">Y</td><td class="text-pass">PASS</td><td><span class="badge badge-pass">Acceptable</span></td></tr>
+          <tr><td>Toluene</td><td>LS/IC</td><td>10</td><td>0</td><td class="text-pass">5.21% Y</td><td class="text-pass">4.02% Y</td><td class="text-pass">.9996 Y</td><td>1.8%</td><td class="text-pass">Y</td><td class="text-pass">PASS</td><td><span class="badge badge-pass">Acceptable</span></td></tr>
+          <tr><td>Ethylbenzene</td><td>LS/IC2</td><td>10</td><td>0</td><td class="text-pass">4.87% Y</td><td class="text-pass">3.55% Y</td><td class="text-pass">.9997 Y</td><td>0.9%</td><td class="text-pass">Y</td><td class="text-pass">PASS</td><td><span class="badge badge-pass">Acceptable</span></td></tr>
+          <tr><td>Xylenes (total)</td><td>LS/IC</td><td>10</td><td>0</td><td class="text-pass">6.12% Y</td><td class="text-pass">4.76% Y</td><td class="text-pass">.9994 Y</td><td>1.4%</td><td class="text-pass">Y</td><td class="text-pass">PASS</td><td><span class="badge badge-pass">Acceptable</span></td></tr>
+          <tr><td>Chloroform</td><td>LS/IC2</td><td>10</td><td>0</td><td class="text-pass">7.33% Y</td><td class="text-pass">5.89% Y</td><td class="text-pass">.9992 Y</td><td>3.1%</td><td class="text-pass">Y</td><td class="text-pass">PASS</td><td><span class="badge badge-pass">Acceptable</span></td></tr>
+          <tr><td>1,1-Dichloroethane</td><td>QD/IC</td><td>9</td><td>0</td><td class="text-pass">3.95% Y</td><td class="text-pass">3.12% Y</td><td class="text-pass">.9998 Y</td><td>0.7%</td><td class="text-pass">Y</td><td class="text-pass">PASS</td><td><span class="badge badge-pass">Acceptable</span></td></tr>
+          <tr style="background:#fff8e1"><td><span class="tip" data-tip="This analyte fails because it's using the Average model (RSD-based) and its RSD of 24.4% exceeds the 15% threshold. The analyst should switch to a regression model (e.g., LS/IC) on the DVD screen.">Dichlorodifluoromethane</span></td><td><span class="tip" data-tip="AVG = Average model. Uses Relative Standard Deviation instead of regression. No R² or RSE. Often fails for volatile compounds with wide concentration ranges.">AVG</span></td><td>10</td><td>0</td><td class="text-fail">24.4% N</td><td>--</td><td>--</td><td>5.2%</td><td class="text-pass">Y</td><td class="text-fail">FAIL</td><td><span class="badge badge-fail">Not Acceptable</span></td></tr>
+          <tr><td>Trichloroethylene</td><td>LS/IC</td><td>10</td><td>1</td><td class="text-pass">9.15% Y</td><td class="text-pass">7.22% Y</td><td class="text-pass">.9989 Y</td><td>4.3%</td><td class="text-pass">Y</td><td class="text-pass">PASS</td><td><span class="badge badge-pass">Acceptable</span></td></tr>
+        </table>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">71 of 72 analytes acceptable. 1 analyte requires model change (Dichlorodifluoromethane — RSD exceeds 15% on Average model).</p>
+      </div>
+
+      <div style="text-align:center;padding:10px">
+        <button class="btn btn-success" onclick="show('approval')" style="padding:12px 40px;font-size:15px">
+          Submit for QA Approval
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== QA APPROVAL ==================== -->
+    <div id="screen-approval" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>QA Approval:</strong> Only users with the QA role can access this screen. Approval is irreversible — once approved, all group data (raw text, computed curves, measurements, config snapshot) is permanently locked. No one can edit or delete approved data. A full audit trail (who, when, comment) is recorded. Rejected groups return to the analyst for correction.</div>
+      </div>
+      <div class="stepper">
+        <div class="step done">1. Lab Setup</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">2. Upload Runs</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">3. Analyte Mapping</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">4. Build Group</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">5. Compute</div><span class="step-arrow">&#8594;</span>
+        <div class="step done">6. Report</div><span class="step-arrow">&#8594;</span>
+        <div class="step active">7. QA Approval</div>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--accent)">
+        <h2>&#10003; QA Review &amp; Approval — GRP-2026-0312</h2>
+        <p style="color:var(--muted)">Review the calibration results below and approve or reject. <span class="tip" data-tip="Approval sets the group status to 'Approved', records an ApprovalRecord with timestamp, reviewer ID, and comment, and prevents ALL future modifications to the group's data. This is required for regulatory compliance and data defensibility.">Approval locks all group data.</span></p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Group Summary</h3>
+          <table>
+            <tr><td style="width:160px;font-weight:600">Group ID</td><td>GRP-2026-0312</td></tr>
+            <tr><td style="font-weight:600">Instrument</td><td>MS4 (GC/MS)</td></tr>
+            <tr><td style="font-weight:600">Analytes</td><td>72 total (71 pass, 1 fail)</td></tr>
+            <tr><td style="font-weight:600">CAL Runs</td><td>10 levels included</td></tr>
+            <tr><td style="font-weight:600">ICV</td><td>Run #1050 — 10 ppb</td></tr>
+            <tr><td style="font-weight:600">Computed By</td><td>Robert A. (Analyst)</td></tr>
+            <tr><td style="font-weight:600">Config Snapshot</td><td>EPA8260C v3</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Quick Status</h3>
+          <div class="grid-2" style="gap:10px">
+            <div class="stat-card" style="border-color:var(--pass)"><div class="num" style="color:var(--pass)">71</div><div class="label">Analytes PASS</div></div>
+            <div class="stat-card" style="border-color:var(--fail)"><div class="num" style="color:var(--fail)">1</div><div class="label">Analytes FAIL</div></div>
+          </div>
+          <div style="background:#fff8e1;border-radius:6px;padding:12px;margin-top:12px;font-size:13px">
+            <strong>Failure:</strong> Dichlorodifluoromethane — RSD 24.4% exceeds 15% threshold on Average model. Analyst should select a different model (e.g., LS/IC).
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Approval Action</h3>
+        <div class="form-group"><label>Reviewer</label><input value="Walter R. (QA Manager)" disabled /></div>
+        <div class="form-group"><label>Comment</label><textarea rows="3" placeholder="Add review notes...">Reviewed against SOP EPA8260C. 71/72 analytes pass all acceptance criteria. Dichlorodifluoromethane requires model change from Average to LS/IC — returning to analyst for correction.</textarea></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-success" style="padding:10px 30px"><span class="tip tip-below" data-tip="Permanently locks all data in this group. Creates an ApprovalRecord. Triggers QuickBooks invoice generation if a customer link exists. Cannot be undone.">Approve &amp; Lock</span></button>
+          <button class="btn btn-danger" style="padding:10px 30px"><span class="tip tip-below" data-tip="Returns the group to 'Computed' status. The analyst can make changes (e.g., switch models, exclude points) and resubmit.">Reject &amp; Return</span></button>
+        </div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px">Approval locks all group results. No further edits allowed. An audit record will be created.</p>
+      </div>
+    </div>
+
+    <!-- ==================== USER MANAGEMENT ==================== -->
+    <div id="screen-users" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>User Management (Admin Only):</strong> Admins create user accounts, assign/remove roles, and link users to Lab Technician profiles. The system prevents the last Admin from removing their own Admin role (self-lockout protection). All role changes are recorded in the Audit Log.</div>
+      </div>
+      <div class="card">
+        <h2>&#9782; User Management <span class="badge badge-role">Admin Only</span></h2>
+        <p style="color:var(--muted);margin-bottom:14px">Assign and remove roles for any user. Role changes take effect on next login.</p>
+        <table>
+          <tr><th>User</th><th>Email</th><th><span class="tip" data-tip="Users can have multiple roles simultaneously (e.g., Admin + QA). Each role grants specific permissions — see the reference table below.">Roles</span></th><th><span class="tip" data-tip="Whether the user has a linked Lab Technician profile. Only users with a technician profile can initiate calibration runs. Viewers and external users typically don't need one.">Lab Technician</span></th><th>Status</th><th>Actions</th></tr>
+          <tr><td>Walter R.</td><td>walter@precisionenv.com</td><td><span class="badge badge-role">Admin</span> <span class="badge badge-role">QA</span></td><td>Linked</td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit Roles</button></td></tr>
+          <tr><td>Robert A.</td><td>robert@precisionenv.com</td><td><span class="badge badge-role">Analyst</span></td><td>Linked</td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit Roles</button></td></tr>
+          <tr><td>Raina M.</td><td>raina@precisionenv.com</td><td><span class="badge badge-role">Analyst</span></td><td>Linked</td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit Roles</button></td></tr>
+          <tr><td>Nathan B.</td><td>nathan@precisionenv.com</td><td><span class="badge badge-role">Analyst</span></td><td>Linked</td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit Roles</button></td></tr>
+          <tr><td>Kirk W.</td><td>kirk@precisionenv.com</td><td><span class="badge badge-role">Viewer</span></td><td>--</td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit Roles</button></td></tr>
+          <tr><td>Jake C.</td><td>jake@precisionenv.com</td><td><span class="badge badge-role">Viewer</span></td><td>--</td><td><span class="badge badge-pass">Active</span></td><td><button class="btn btn-outline btn-sm">Edit Roles</button></td></tr>
+        </table>
+        <br/><button class="btn btn-primary">+ Create New User</button>
+      </div>
+      <div class="card">
+        <h3>Role Permissions Reference</h3>
+        <table>
+          <tr><th>Role</th><th>Upload Runs</th><th>Compute</th><th>Approve</th><th>Edit Config</th><th>Manage Users</th><th>View</th></tr>
+          <tr><td><strong>Admin</strong></td><td class="text-pass">Yes</td><td class="text-pass">Yes</td><td class="text-pass">Yes</td><td class="text-pass">Yes</td><td class="text-pass">Yes</td><td class="text-pass">Yes</td></tr>
+          <tr><td><strong>Analyst</strong></td><td class="text-pass">Yes</td><td class="text-pass">Yes</td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-pass">Yes</td></tr>
+          <tr><td><strong>QA</strong></td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-pass">Yes</td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-pass">Yes</td></tr>
+          <tr><td><strong>Viewer</strong></td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-fail">No</td><td class="text-pass">Yes</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== METHOD CONFIG ==================== -->
+    <div id="screen-config" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Method Configuration (Admin Only):</strong> Defines all acceptance thresholds, default regression type, weighting, and calibration levels for an EPA method. Changes create a new version — existing groups keep their snapshotted version permanently. This ensures reproducibility: you can always see exactly which rules were applied when a group was computed.</div>
+      </div>
+      <div class="card">
+        <h2>&#9874; Method Configuration <span class="badge badge-role">Admin Only</span></h2>
+        <p style="color:var(--muted);margin-bottom:14px">Changes create a new config version. Existing calibration groups retain the version they were computed with.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Active Config — EPA8260C <span class="badge badge-info">v3</span></h3>
+          <div class="form-row">
+            <div class="form-group"><label><span class="tip tip-below" data-tip="The default regression type applied to all analytes initially. Analysts can override per-analyte on the DVD screen. Average = RSD-based, Linear = y=mx+b, Quadratic = y=ax²+bx+c.">Default Regression Type</span></label><select><option>Average</option><option selected>Linear</option><option>Linear (Forced Zero)</option><option>Quadratic</option></select></div>
+            <div class="form-group"><label><span class="tip tip-below" data-tip="Weighting scheme for the regression. None = equal weight to all points. 1/x = weight by 1/concentration (emphasizes low-end accuracy). 1/x² = even more emphasis on low concentrations.">Default Weighting</span></label><select><option>None (equal)</option><option selected>1/x</option><option>1/x&sup2;</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label><span class="tip tip-below" data-tip="If Yes, the regression line is forced through the origin (0,0). Used when theory says zero concentration should give zero response. Reduces a degree of freedom.">Force Zero Intercept</span></label><select><option selected>No</option><option>Yes</option></select></div>
+            <div class="form-group"><label><span class="tip tip-below" data-tip="Whether to display 'r' (Pearson correlation coefficient) or 'R²' (coefficient of determination). Most EPA methods use R² but some older SOPs reference r. The system always calculates both.">Label Mode</span></label><select><option>r (correlation)</option><option selected>R&sup2; (determination)</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Min R&sup2;</label><input value="0.995" /></div>
+            <div class="form-group"><label>Max RSE (%)</label><input value="15" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>%Diff Low Bound</label><input value="-20" /></div>
+            <div class="form-group"><label>%Diff High Bound</label><input value="20" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Min Points Required</label><input value="5" /></div>
+            <div class="form-group"><label>Max Missed Points</label><input value="1" /></div>
+          </div>
+          <div class="form-group"><label>ICV Limit (%)</label><input value="20" /></div>
+          <button class="btn btn-primary">Save as v4</button>
+        </div>
+        <div class="card">
+          <h3><span class="tip tip-below" data-tip="Calibration levels define the known concentrations used for building calibration curves. Typically 5-10 levels spanning the reporting range. When the analyst uploads a run, they select one of these levels.">Calibration Levels</span></h3>
+          <table>
+            <tr><th>Level Name</th><th><span class="tip" data-tip="The exact known concentration (in ppb) of the calibration standard at this level. Defined by the standard preparation.">True Concentration</span></th><th>Sort Order</th><th></th></tr>
+            <tr><td>Cal_0.1ppb</td><td>0.1</td><td>1</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_0.5ppb</td><td>0.5</td><td>2</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_1ppb</td><td>1.0</td><td>3</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_2ppb</td><td>2.0</td><td>4</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_5ppb</td><td>5.0</td><td>5</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_10ppb</td><td>10.0</td><td>6</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_20ppb</td><td>20.0</td><td>7</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_50ppb</td><td>50.0</td><td>8</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_100ppb</td><td>100.0</td><td>9</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+            <tr><td>Cal_200ppb</td><td>200.0</td><td>10</td><td><button class="btn btn-outline btn-sm">Edit</button></td></tr>
+          </table>
+          <br/><button class="btn btn-outline">+ Add Level</button>
+          <h3><span class="tip tip-below" data-tip="Every config change creates a new version. Old versions are never deleted. Each calibration group permanently stores which config version it was computed with, ensuring full auditability.">Version History</span></h3>
+          <table>
+            <tr><th>Version</th><th>Changed By</th><th>Date</th><th>Changes</th></tr>
+            <tr><td>v3</td><td>Walter R.</td><td>Feb 15, 2026</td><td>Updated max RSE from 20% to 15%</td></tr>
+            <tr><td>v2</td><td>Walter R.</td><td>Jan 8, 2026</td><td>Added Cal_0.1ppb level</td></tr>
+            <tr><td>v1</td><td>Walter R.</td><td>Dec 1, 2025</td><td>Initial configuration</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== QUICKBOOKS ==================== -->
+    <div id="screen-quickbooks" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>QuickBooks Integration:</strong> After QA approval, the system can automatically generate invoices in QuickBooks Online for the client. Uses OAuth 2.0 for secure connection. Customers are synced from QuickBooks and linked to calibration groups via a QuickBooksCustomerLink. Invoice generation only triggers after approval, ensuring only finalized work is billed.</div>
+      </div>
+      <div class="card">
+        <h2>$ QuickBooks Integration</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3><span class="tip tip-below" data-tip="OAuth 2.0 connection to QuickBooks Online. Tokens refresh automatically but expire after a period. If disconnected, no invoices can be generated.">Connection Status</span></h3>
+          <div style="background:#e8f5e9;border-radius:8px;padding:16px;margin-bottom:12px">
+            <div style="font-size:16px;font-weight:700;color:var(--pass)">Connected</div>
+            <div style="font-size:13px;color:var(--muted)"><span class="tip" data-tip="QuickBooks 'Realm' = the company entity in QuickBooks Online. Identifies which QuickBooks account is linked.">Realm: Precision Environmental Labs, Inc.</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">Environment: Production | Token expires: Mar 15, 2026</div>
+          </div>
+          <button class="btn btn-outline">Reconnect</button>
+        </div>
+        <div class="card">
+          <h3><span class="tip tip-below" data-tip="Pulls the customer list from QuickBooks Online into WLTR. Customer records are linked to calibration groups so invoices can be auto-generated after approval.">Customer Sync</span></h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Last sync: Mar 9, 2026 3:15 PM</p>
+          <table>
+            <tr><td>Customers synced</td><td><strong>24</strong></td></tr>
+            <tr><td>Created</td><td>0</td></tr>
+            <tr><td>Updated</td><td>2</td></tr>
+            <tr><td>Failed</td><td>0</td></tr>
+          </table>
+          <br/><button class="btn btn-primary btn-sm">Sync Now</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Recent Invoices</h3>
+        <table>
+          <tr><th>Group</th><th><span class="tip" data-tip="The QuickBooks customer linked to this calibration group. The link is established when the group is created.">Customer</span></th><th>Amount</th><th><span class="tip" data-tip="The invoice number in QuickBooks Online. Created automatically after QA approval if a customer link exists.">QB Invoice</span></th><th><span class="tip" data-tip="Pending = awaiting approval. Sent = invoice created in QB. Paid = payment recorded in QB.">Status</span></th><th>Created</th></tr>
+          <tr><td>GRP-2026-0312</td><td>Acme Environmental</td><td>$150.00</td><td>INV-4521</td><td><span class="badge badge-pass">Paid</span></td><td>Mar 8</td></tr>
+          <tr><td>GRP-2026-0311</td><td>Midwest Drilling Co.</td><td>$95.00</td><td>INV-4520</td><td><span class="badge badge-info">Sent</span></td><td>Mar 7</td></tr>
+          <tr><td>GRP-2026-0310</td><td>Acme Environmental</td><td>$150.00</td><td>--</td><td><span class="badge badge-warn">Pending</span></td><td>--</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== AUDIT LOG ==================== -->
+    <div id="screen-audit" class="screen hidden">
+      <div class="annotation-bar">
+        <span class="ab-icon">&#9432;</span>
+        <div><strong>Audit Log:</strong> Every significant action in the system is recorded with who, when, what, and a correlation/trace ID. Entries are immutable — they can never be edited or deleted. This log is essential for regulatory compliance (EPA, TNI) and provides a complete chain of custody for all calibration data.</div>
+      </div>
+      <div class="card">
+        <h2>&#128270; Audit Log</h2>
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <select style="width:180px"><option>All Actions</option><option>Run Uploaded</option><option>Approval</option><option>Config Change</option><option>Role Change</option><option>Point Exclusion</option></select>
+          <select style="width:160px"><option>All Users</option><option>Robert A.</option><option>Raina M.</option><option>Walter R.</option></select>
+          <input type="date" style="width:160px" value="2026-03-10" />
+          <button class="btn btn-primary btn-sm">Filter</button>
+        </div>
+        <table>
+          <tr><th>Timestamp</th><th>User</th><th><span class="tip" data-tip="The type of action: Run Uploaded, Computation, Approval, Rejection, Point Excluded, Alias Created, Role Change, Config Change, QB Sync, etc.">Action</span></th><th><span class="tip" data-tip="The specific database entity affected (run, group, analyte, user, etc.) with its ID.">Entity</span></th><th>Detail</th><th><span class="tip" data-tip="A distributed tracing ID (W3C Trace Context format). Links this audit entry to the full HTTP request chain for debugging and forensic analysis.">Trace ID</span></th></tr>
+          <tr><td>Mar 10, 10:45 AM</td><td>Walter R.</td><td>Approval</td><td>GRP-2026-0312</td><td>Approved with comment</td><td class="mono" style="font-size:11px">00-a7f3c9</td></tr>
+          <tr><td>Mar 10, 10:42 AM</td><td>Robert A.</td><td>Computation</td><td>GRP-2026-0312</td><td>Config EPA8260C v3</td><td class="mono" style="font-size:11px">00-b8e2d1</td></tr>
+          <tr><td>Mar 10, 10:38 AM</td><td>Robert A.</td><td>Point Excluded</td><td>PT-8821</td><td>Cal_0.1 excluded for Benzene (manual: outlier at low end)</td><td class="mono" style="font-size:11px">00-c9f4e2</td></tr>
+          <tr><td>Mar 10, 10:30 AM</td><td>Robert A.</td><td>Run Uploaded</td><td>RUN-1050</td><td>ICV_10ppb on MS4, hash: a7f3...e2d1</td><td class="mono" style="font-size:11px">00-d1a5f3</td></tr>
+          <tr><td>Mar 10, 10:15 AM</td><td>Robert A.</td><td>Alias Created</td><td>Analyte #42</td><td>"Unknown-Cmpd-X42" mapped to 1,1-Dichloroethane</td><td class="mono" style="font-size:11px">00-e2b6a4</td></tr>
+          <tr><td>Mar 10, 9:00 AM</td><td>Robert A.</td><td>Run Uploaded</td><td>RUN-1040</td><td>CAL Cal_0.1ppb on MS4, hash: f3c9...b8e2</td><td class="mono" style="font-size:11px">00-f3c7b5</td></tr>
+          <tr><td>Mar 9, 4:30 PM</td><td>Walter R.</td><td>Role Assigned</td><td>User: Kirk W.</td><td>Added role: Viewer</td><td class="mono" style="font-size:11px">00-a4d8c6</td></tr>
+          <tr><td>Mar 9, 3:15 PM</td><td>Walter R.</td><td>QB Customer Sync</td><td>QuickBooks</td><td>24 synced (2 updated)</td><td class="mono" style="font-size:11px">00-b5e9d7</td></tr>
+        </table>
+      </div>
+    </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+const screens = ['dashboard','upload','mapping','group','dvd','report','approval','labsetup','users','config','quickbooks','audit'];
+const titles = {
+  dashboard:'Dashboard', upload:'Upload Run', mapping:'Analyte Mapping',
+  group:'Calibration Group Builder', dvd:'DVD / Regression Dashboard',
+  report:'Summary Report', approval:'QA Approval',
+  labsetup:'Lab Setup', users:'User Management',
+  config:'Method Configuration', quickbooks:'QuickBooks Integration',
+  audit:'Audit Log'
+};
+const crumbs = {
+  dashboard:'<a href="#" onclick="show(\'dashboard\')">Home</a>',
+  upload:'<a href="#" onclick="show(\'dashboard\')">Home</a> / Upload Run',
+  mapping:'<a href="#" onclick="show(\'dashboard\')">Home</a> / <a href="#" onclick="show(\'upload\')">Upload</a> / Analyte Mapping',
+  group:'<a href="#" onclick="show(\'dashboard\')">Home</a> / Calibration Groups',
+  dvd:'<a href="#" onclick="show(\'dashboard\')">Home</a> / <a href="#" onclick="show(\'group\')">Groups</a> / DVD Regression',
+  report:'<a href="#" onclick="show(\'dashboard\')">Home</a> / <a href="#" onclick="show(\'group\')">Groups</a> / Summary Report',
+  approval:'<a href="#" onclick="show(\'dashboard\')">Home</a> / <a href="#" onclick="show(\'report\')">Report</a> / QA Approval',
+  labsetup:'<a href="#" onclick="show(\'dashboard\')">Home</a> / Admin / Lab Setup',
+  users:'<a href="#" onclick="show(\'dashboard\')">Home</a> / Admin / User Management',
+  config:'<a href="#" onclick="show(\'dashboard\')">Home</a> / Admin / Method Config',
+  quickbooks:'<a href="#" onclick="show(\'dashboard\')">Home</a> / Admin / QuickBooks',
+  audit:'<a href="#" onclick="show(\'dashboard\')">Home</a> / Admin / Audit Log'
+};
+function show(id){
+  screens.forEach(s=>{
+    document.getElementById('screen-'+s).classList.toggle('hidden',s!==id);
+    const nav=document.getElementById('nav-'+s);
+    if(nav) nav.classList.toggle('active',s===id);
+  });
+  document.getElementById('page-title').textContent=titles[id]||id;
+  document.getElementById('breadcrumb').innerHTML=crumbs[id]||'';
+  window.scrollTo({top:0,behavior:'smooth'});
+  return false;
+}
+</script>
+</body>
+</html>

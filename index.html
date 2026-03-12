@@ -214,10 +214,62 @@
       color:var(--muted);
       box-shadow:var(--shadow);
     }
+    .nav-banner{
+      background:linear-gradient(135deg, var(--primary), var(--primary2));
+      color:#fff;
+      padding:16px 20px;
+      border-radius:10px;
+      margin-bottom:24px;
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+    .nav-banner-text{
+      font-size:15px;
+      font-weight:500;
+    }
+    .nav-banner-link{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#fff;
+      color:var(--primary);
+      padding:10px 20px;
+      border-radius:6px;
+      text-decoration:none;
+      font-weight:600;
+      font-size:14px;
+      transition:all 0.2s;
+      box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    }
+    .nav-banner-link:hover{
+      background:var(--soft);
+      transform:translateY(-1px);
+      box-shadow:0 4px 8px rgba(0,0,0,0.15);
+    }
+    .nav-banner-link::before{
+      content:"🎨";
+      font-size:18px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Navigation Banner: Quick access to UI Mockup -->
+    <!-- This banner provides easy navigation to the interactive UI mockup that demonstrates -->
+    <!-- the actual application interface, screens, and user workflows described in this backlog -->
+    <div class="nav-banner">
+      <div class="nav-banner-text">
+        <strong>📋 View UI Mockup:</strong> See the interactive prototype of the application interface
+      </div>
+      <a href="mockup.html" class="nav-banner-link" title="Navigate to the UI Mockup - Interactive prototype showing all application screens and workflows">
+        Open UI Mockup
+      </a>
+    </div>
+
     <h1>Calibration Analytics Web Application – Scrum Backlog with Estimated Man Hours</h1>
 
     <div class="intro">
@@ -226,6 +278,13 @@
         calibration analytics workbook and adds QuickBooks integration. It covers the entire scope from project setup through
         deployment, including ingestion, parsing, mapping, normalization, manual regression, statistics, ICV verification,
         reporting, QA approval, testing, and accounting sync.
+      </p>
+      <!-- Note: An interactive UI mockup (mockup.html) is available to visualize the application interface -->
+      <!-- The mockup demonstrates all screens, workflows, and user interactions described in this backlog -->
+      <p>
+        <strong>💡 UI Mockup Available:</strong> An interactive prototype of the application interface is available in 
+        <a href="mockup.html" style="color:var(--primary);font-weight:600;text-decoration:none;border-bottom:1px solid var(--primary)" title="Navigate to the UI Mockup - See the interactive prototype">mockup.html</a>. 
+        The mockup shows all screens, navigation flows, and user workflows that will be built according to this backlog.
       </p>
       <p>The backlog reproduces behavior currently spread across these workbook areas:</p>
       <ul>
